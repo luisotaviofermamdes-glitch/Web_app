@@ -17,25 +17,53 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Set up Android SDK and NDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK 29 and native build dependencies
+        shell: bash
+        run: |
+          sdkmanager --install "platforms;android-35" "build-tools;35.0.0" "ndk;29.0.14206865"
+          sudo apt-get update
+          sudo apt-get install -y ninja-build meson pkg-config python3-pip
+
+      - name: Build real QEMU for Android arm64-v8a
+        shell: bash
+        run: |
+          chmod +x vm/qemu/build-real-qemu-android.sh
+          vm/qemu/build-real-qemu-android.sh
+          test -x app/src/main/assets/vm/bin/qemu-system-x86_64
+          file app/src/main/assets/vm/bin/qemu-system-x86_64
+          stat -c 'QEMU binary size: %s bytes' app/src/main/assets/vm/bin/qemu-system-x86_64
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
 
-      - name: Build debug APK
+      - name: Build debug APK with QEMU included
         run: gradle assembleDebug --no-daemon
 
-      - name: Verify APK is not the tiny wrapper build
+      - name: Verify APK contains real VM engine and is not the tiny wrapper build
         shell: bash
         run: |
           APK="app/build/outputs/apk/debug/app-debug.apk"
+          QEMU="app/src/main/assets/vm/bin/qemu-system-x86_64"
           test -f "$APK"
-          SIZE=$(stat -c%s "$APK")
-          echo "APK size: $SIZE bytes"
-          if [ "$SIZE" -lt 1048576 ]; then
-            echo "ERROR: APK is smaller than 1 MiB. A real VM build must contain native VM components and cannot be accepted as the final APK."
+          test -x "$QEMU"
+          QEMU_SIZE=$(stat -c%s "$QEMU")
+          APK_SIZE=$(stat -c%s "$APK")
+          echo "QEMU size: $QEMU_SIZE bytes"
+          echo "APK size: $APK_SIZE bytes"
+          if [ "$QEMU_SIZE" -lt 1048576 ]; then
+            echo "ERROR: packaged QEMU is smaller than 1 MiB; refusing a fake/dummy engine."
             exit 1
           fi
+          if [ "$APK_SIZE" -lt 1048576 ]; then
+            echo "ERROR: APK is smaller than 1 MiB."
+            exit 1
+          fi
+          unzip -l "$APK" | grep -E 'assets/vm/bin/qemu-system-x86_64|assets/vm/firmware' || true
 
       - name: Rename APK
         run: cp app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/Web_app.apk
@@ -45,7 +73,7 @@ jobs:
         run: |
           APK="app/build/outputs/apk/debug/Web_app.apk"
           SIZE=$(stat -c%s "$APK")
-          printf 'apk=Web_app.apk\nsize_bytes=%s\ncommit=%s\n' "$SIZE" "${GITHUB_SHA}" > app/build/outputs/apk/debug/Web_app-build.txt
+          printf 'apk=Web_app.apk\nsize_bytes=%s\ncommit=%s\nqemu=real-arm64\n' "$SIZE" "${GITHUB_SHA}" > app/build/outputs/apk/debug/Web_app-build.txt
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
