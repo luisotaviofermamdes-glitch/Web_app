@@ -15,7 +15,7 @@ import java.io.RandomAccessFile;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/** Android bridge used by the Web_app Windows VM screen. */
+/** Android bridge for the Web_app Windows VM screen. */
 public final class VmBridge {
     private static final int REQ_ISO = 4101;
     private static final int REQ_EXPORT = 4102;
@@ -25,15 +25,25 @@ public final class VmBridge {
     private final File sharedDir;
     private final ExecutorService io = Executors.newSingleThreadExecutor();
     private Process vmProcess;
-    private String pendingResult = "";
+    private volatile String pendingResult = "";
     private String exportName = "";
 
     public VmBridge(Activity activity) {
         this.activity = activity;
-        vmDir = new File(activity.getFilesDir(), "windows10-vm");
+        vmDir = new File(activity.getFilesDir(), "windows-vm");
         sharedDir = new File(vmDir, "shared");
-        if (!vmDir.exists()) vmDir.mkdirs();
-        if (!sharedDir.exists()) sharedDir.mkdirs();
+        vmDir.mkdirs();
+        sharedDir.mkdirs();
+    }
+
+    @JavascriptInterface
+    public void openWindowsDownloadPage() {
+        try {
+            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.microsoft.com/software-download/windows11"));
+            activity.startActivity(i);
+        } catch (Exception e) {
+            pendingResult = "BROWSER_ERROR:" + e.getMessage();
+        }
     }
 
     @JavascriptInterface
@@ -81,20 +91,27 @@ public final class VmBridge {
 
     @JavascriptInterface
     public String getVmInfo() {
-        File iso = new File(vmDir, "windows10.iso");
-        File disk = new File(vmDir, "windows10.img");
+        File iso = new File(vmDir, "windows.iso");
+        File oldIso = new File(vmDir, "windows10.iso");
+        if (!iso.exists() && oldIso.exists()) oldIso.renameTo(iso);
+        File disk = new File(vmDir, "windows.img");
+        File oldDisk = new File(vmDir, "windows10.img");
+        if (!disk.exists() && oldDisk.exists()) oldDisk.renameTo(disk);
         File qemu = new File(new File(vmDir, "bin"), "qemu-system-x86_64");
         File[] files = sharedDir.listFiles();
-        return "ISO=" + iso.exists() + ";DISK=" + disk.exists() + ";QEMU=" + qemu.exists() +
+        String isoName = iso.exists() ? iso.getName() : "";
+        long isoSize = iso.exists() ? iso.length() : 0;
+        return "ISO=" + iso.exists() + ";ISO_NAME=" + isoName + ";ISO_SIZE=" + isoSize +
+                ";DISK=" + disk.exists() + ";QEMU=" + qemu.exists() +
                 ";SHARED=" + (files == null ? 0 : files.length) +
                 ";RUNNING=" + (vmProcess != null && vmProcess.isAlive());
     }
 
     @JavascriptInterface
     public void createWindowsDisk(final int gigabytes) {
-        final int size = Math.max(16, Math.min(gigabytes, 128));
+        final int size = Math.max(32, Math.min(gigabytes, 256));
         io.execute(() -> {
-            File disk = new File(vmDir, "windows10.img");
+            File disk = new File(vmDir, "windows.img");
             try (RandomAccessFile raf = new RandomAccessFile(disk, "rw")) {
                 raf.setLength((long) size * 1024L * 1024L * 1024L);
                 pendingResult = "DISK_OK:" + size + "GB";
@@ -108,8 +125,8 @@ public final class VmBridge {
     public void startVm() {
         if (vmProcess != null && vmProcess.isAlive()) return;
         File qemu = new File(new File(vmDir, "bin"), "qemu-system-x86_64");
-        File iso = new File(vmDir, "windows10.iso");
-        File disk = new File(vmDir, "windows10.img");
+        File iso = new File(vmDir, "windows.iso");
+        File disk = new File(vmDir, "windows.img");
         if (!qemu.exists() || !iso.exists() || !disk.exists()) {
             pendingResult = "VM_MISSING_COMPONENT";
             return;
@@ -153,7 +170,7 @@ public final class VmBridge {
         if (resultCode != Activity.RESULT_OK || data == null) return;
         if (requestCode == REQ_ISO && data.getData() != null) {
             final Uri uri = data.getData();
-            io.execute(() -> copyUriToFile(uri, new File(vmDir, "windows10.iso"), "ISO_OK", "ISO_ERROR"));
+            io.execute(() -> copyUriToFile(uri, new File(vmDir, "windows.iso"), "ISO_OK", "ISO_ERROR"));
         } else if (requestCode == REQ_IMPORT) {
             io.execute(() -> importSelection(data));
         } else if (requestCode == REQ_EXPORT && data.getData() != null && !exportName.isEmpty()) {
