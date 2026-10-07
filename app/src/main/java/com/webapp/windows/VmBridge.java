@@ -3,6 +3,7 @@ package com.webapp.windows;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.webkit.JavascriptInterface;
 import java.io.File;
@@ -23,6 +24,7 @@ public final class VmBridge {
     private final Activity activity;
     private final File vmDir;
     private final File sharedDir;
+    private final File qemuFile;
     private final ExecutorService io = Executors.newSingleThreadExecutor();
     private Process vmProcess;
     private volatile String pendingResult = "";
@@ -32,8 +34,38 @@ public final class VmBridge {
         this.activity = activity;
         vmDir = new File(activity.getFilesDir(), "windows-vm");
         sharedDir = new File(vmDir, "shared");
+        qemuFile = new File(vmDir, "bin/qemu-system-x86_64");
         vmDir.mkdirs();
         sharedDir.mkdirs();
+        ensurePackagedVmEngine();
+    }
+
+    private void ensurePackagedVmEngine() {
+        if (qemuFile.isFile() && qemuFile.length() >= 1024 * 1024) {
+            qemuFile.setExecutable(true, false);
+            return;
+        }
+        io.execute(() -> {
+            try {
+                qemuFile.getParentFile().mkdirs();
+                copyAsset("vm/bin/qemu-system-x86_64", qemuFile);
+                qemuFile.setExecutable(true, false);
+                pendingResult = "QEMU_INSTALLED:" + qemuFile.length();
+            } catch (Exception e) {
+                pendingResult = "QEMU_INSTALL_ERROR:" + e.getMessage();
+            }
+        });
+    }
+
+    private void copyAsset(String assetPath, File target) throws IOException {
+        AssetManager assets = activity.getAssets();
+        try (InputStream in = assets.open(assetPath, AssetManager.ACCESS_STREAMING);
+             OutputStream out = new FileOutputStream(target)) {
+            byte[] buffer = new byte[1024 * 1024];
+            int n;
+            while ((n = in.read(buffer)) != -1) out.write(buffer, 0, n);
+            out.flush();
+        }
     }
 
     @JavascriptInterface
@@ -97,12 +129,12 @@ public final class VmBridge {
         File disk = new File(vmDir, "windows.img");
         File oldDisk = new File(vmDir, "windows10.img");
         if (!disk.exists() && oldDisk.exists()) oldDisk.renameTo(disk);
-        File qemu = new File(new File(vmDir, "bin"), "qemu-system-x86_64");
         File[] files = sharedDir.listFiles();
         String isoName = iso.exists() ? iso.getName() : "";
         long isoSize = iso.exists() ? iso.length() : 0;
         return "ISO=" + iso.exists() + ";ISO_NAME=" + isoName + ";ISO_SIZE=" + isoSize +
-                ";DISK=" + disk.exists() + ";QEMU=" + qemu.exists() +
+                ";DISK=" + disk.exists() + ";QEMU=" + qemuFile.exists() +
+                ";QEMU_SIZE=" + qemuFile.length() +
                 ";SHARED=" + (files == null ? 0 : files.length) +
                 ";RUNNING=" + (vmProcess != null && vmProcess.isAlive());
     }
@@ -124,17 +156,16 @@ public final class VmBridge {
     @JavascriptInterface
     public void startVm() {
         if (vmProcess != null && vmProcess.isAlive()) return;
-        File qemu = new File(new File(vmDir, "bin"), "qemu-system-x86_64");
         File iso = new File(vmDir, "windows.iso");
         File disk = new File(vmDir, "windows.img");
-        if (!qemu.exists() || !iso.exists() || !disk.exists()) {
+        if (!qemuFile.exists() || qemuFile.length() < 1024 * 1024 || !iso.exists() || !disk.exists()) {
             pendingResult = "VM_MISSING_COMPONENT";
             return;
         }
         try {
-            qemu.setExecutable(true);
+            qemuFile.setExecutable(true, false);
             ProcessBuilder pb = new ProcessBuilder(
-                    qemu.getAbsolutePath(), "-machine", "q35",
+                    qemuFile.getAbsolutePath(), "-machine", "q35",
                     "-accel", "tcg,thread=multi", "-cpu", "max", "-smp", "2", "-m", "2048",
                     "-drive", "file=" + disk.getAbsolutePath() + ",format=raw,if=ide",
                     "-drive", "file=fat:rw:" + sharedDir.getAbsolutePath() + ",format=raw,if=ide",
