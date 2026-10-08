@@ -1,366 +1,226 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0078d4">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="description" content="web_app V4 — Simulação realista do Windows 10 + Área de Trabalho Remota">
-<link rel="manifest" href="manifest.json">
 <title>Windows 10</title>
 <style>
-:root {
-  --accent: #0078d4;
-  --accent-dark: #005a9e;
-  --taskbar: #1a1a1a;
-  --titlebar-h: 30px;
-  --taskbar-h: 48px;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { width: 100%; height: 100%; overflow: hidden; font-family: "Segoe UI", Arial, sans-serif; background: #000; }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-html, body {
-  width: 100%; height: 100%; overflow: hidden;
-  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-  background: #000; color: #111;
-  touch-action: manipulation;
-  user-select: none;
-}
-button, input, textarea { font: inherit; border: none; background: none; outline: none; }
-button { cursor: pointer; }
-input, textarea { user-select: text; }
-
-/* ===== LOGIN (estilo Windows 10) ===== */
+/* Login */
 #login {
-  position: fixed; inset: 0; z-index: 50000;
-  background: linear-gradient(135deg, #0078d4 0%, #002050 100%);
+  position: fixed; inset: 0; z-index: 9999;
+  background: linear-gradient(135deg, #0078d4, #001a33);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  color: #fff; transition: opacity .4s;
+  color: #fff;
 }
-#login.hide { opacity: 0; pointer-events: none; }
-.login-time {
-  font-size: 64px; font-weight: 200; letter-spacing: -1px;
-  margin-bottom: 4px;
-}
-.login-date { font-size: 18px; font-weight: 300; opacity: .9; margin-bottom: 40px; }
-.login-user {
-  display: flex; flex-direction: column; align-items: center; gap: 12px;
-}
+#login.hidden { display: none; }
+.login-time { font-size: 56px; font-weight: 200; }
+.login-date { font-size: 16px; opacity: 0.85; margin-bottom: 30px; }
 .login-avatar {
-  width: 96px; height: 96px; border-radius: 50%;
-  background: rgba(255,255,255,.15);
-  display: grid; place-items: center; font-size: 42px;
-  border: 2px solid rgba(255,255,255,.25);
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center;
+  font-size: 36px; margin-bottom: 10px;
 }
-.login-name { font-size: 22px; font-weight: 300; }
-.login-input {
-  width: 280px; padding: 10px 14px; margin-top: 8px;
-  background: rgba(0,0,0,.25); color: #fff;
-  border: 1px solid rgba(255,255,255,.3); border-radius: 2px;
-}
-.login-input::placeholder { color: rgba(255,255,255,.5); }
+.login-name { font-size: 20px; margin-bottom: 12px; }
 .login-btn {
-  margin-top: 12px; padding: 8px 32px;
-  background: rgba(255,255,255,.2); color: #fff;
-  border: 1px solid rgba(255,255,255,.3); border-radius: 2px;
-  transition: background .15s;
+  padding: 8px 28px; background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.4); color: #fff; border-radius: 3px;
+  font-size: 14px; cursor: pointer;
 }
-.login-btn:hover { background: rgba(255,255,255,.3); }
-.login-skip {
-  margin-top: 20px; font-size: 13px; opacity: .6;
-  text-decoration: underline; cursor: pointer;
-}
+.login-btn:hover { background: rgba(255,255,255,0.3); }
+.login-skip { margin-top: 16px; font-size: 13px; opacity: 0.6; text-decoration: underline; cursor: pointer; }
 
-/* ===== DESKTOP ===== */
+/* Desktop */
 #desktop {
-  position: absolute; inset: 0 0 var(--taskbar-h) 0;
-  background: #0078d4 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath fill='%23ffffff08' d='M0 0h50v50H0zm50 50h50v50H50z'/%3E%3C/svg%3E");
-  background: linear-gradient(160deg, #0a4d8c 0%, #0078d4 40%, #1a3a5c 100%);
+  position: absolute; inset: 0 0 48px 0;
+  background: linear-gradient(160deg, #0a4d8c, #0078d4 45%, #1a3a5c);
   overflow: hidden;
 }
-
-/* Desktop icons */
-.icons {
-  position: absolute; top: 10px; left: 8px;
-  display: flex; flex-direction: column; gap: 1px; z-index: 10;
-}
+.icons { position: absolute; top: 12px; left: 8px; display: flex; flex-direction: column; gap: 4px; }
 .icon {
-  width: 76px; padding: 6px 2px; text-align: center;
-  color: #fff; font-size: 11px; border-radius: 2px;
-  text-shadow: 0 1px 2px #000a; transition: background .1s;
+  width: 74px; text-align: center; color: #fff; font-size: 11px;
+  padding: 6px 2px; border-radius: 3px; text-shadow: 0 1px 2px #000;
+  cursor: pointer;
 }
-.icon:hover { background: rgba(255,255,255,.15); outline: 1px solid rgba(255,255,255,.25); }
-.icon .ico { display: block; font-size: 28px; margin-bottom: 2px; line-height: 1.15; filter: drop-shadow(0 1px 2px #0006); }
+.icon:hover { background: rgba(255,255,255,0.15); }
+.icon span { display: block; font-size: 28px; margin-bottom: 2px; }
 
-/* ===== WINDOWS ===== */
+/* Windows */
 .window {
-  position: absolute;
-  width: min(860px, 96vw); height: min(560px, 82vh);
-  min-width: 320px; min-height: 240px;
-  background: #f0f0f0;
-  border: 1px solid #1118;
-  box-shadow: 0 10px 40px #0006, 0 0 0 1px #0002;
-  display: none; overflow: hidden; z-index: 100;
-  border-radius: 0;
+  position: absolute; display: none;
+  width: min(800px, 95vw); height: min(520px, 78vh);
+  background: #f0f0f0; border: 1px solid #333;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+  flex-direction: column; z-index: 100;
 }
-.window.open { display: flex; flex-direction: column; animation: winIn .14s ease-out; }
-@keyframes winIn {
-  from { opacity: 0; transform: scale(.96) translateY(8px); }
-  to { opacity: 1; transform: none; }
-}
-.window.maximized {
-  left: 0 !important; top: 0 !important;
-  width: 100% !important; height: 100% !important;
-  border: none; border-radius: 0;
-}
+.window.show { display: flex; }
+.window.maximized { left: 0 !important; top: 0 !important; width: 100% !important; height: 100% !important; }
 
 .titlebar {
-  height: var(--titlebar-h);
-  background: #fff;
-  display: flex; align-items: center; justify-content: space-between;
-  padding-left: 10px; flex-shrink: 0;
-  border-bottom: 1px solid #e5e5e5;
-  cursor: grab; font-size: 12px; color: #333;
+  height: 32px; background: #fff; display: flex; align-items: center;
+  justify-content: space-between; padding-left: 10px;
+  border-bottom: 1px solid #ddd; cursor: move; font-size: 13px; flex-shrink: 0;
 }
-.titlebar:active { cursor: grabbing; }
-.titlebar b { font-weight: 400; display: flex; align-items: center; gap: 6px; }
+.titlebar b { font-weight: 400; }
 .controls { display: flex; height: 100%; }
 .controls button {
-  width: 45px; height: 100%; font-size: 10px; color: #333;
-  transition: background .08s;
+  width: 46px; height: 100%; border: none; background: none; font-size: 12px; cursor: pointer;
 }
 .controls button:hover { background: #e5e5e5; }
 .controls .close:hover { background: #e81123; color: #fff; }
 
-.win-body { flex: 1; overflow: auto; background: #fff; position: relative; }
+.win-body { flex: 1; overflow: auto; background: #fff; padding: 0; }
 
-/* Toolbar */
+/* Apps content */
 .toolbar {
-  display: flex; gap: 5px; align-items: center; flex-wrap: wrap;
-  padding: 5px 8px; background: #f5f5f5; border-bottom: 1px solid #ddd;
+  display: flex; gap: 6px; padding: 6px 8px; background: #f5f5f5;
+  border-bottom: 1px solid #ddd; align-items: center;
 }
 .toolbar input {
-  flex: 1; min-width: 80px; padding: 4px 8px;
-  border: 1px solid #ccc; background: #fff; font-size: 12px;
+  flex: 1; padding: 5px 8px; border: 1px solid #ccc; font-size: 13px;
 }
 .btn {
-  padding: 4px 11px; border: 1px solid #adadad; background: #e1e1e1;
-  font-size: 12px; border-radius: 2px; transition: background .1s;
+  padding: 5px 12px; border: 1px solid #aaa; background: #e8e8e8;
+  font-size: 12px; cursor: pointer; border-radius: 2px;
 }
-.btn:hover { background: #d4d4d4; }
-.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-.btn.primary:hover { background: var(--accent-dark); }
+.btn:hover { background: #ddd; }
+.btn.primary { background: #0078d4; color: #fff; border-color: #0078d4; }
+.btn.primary:hover { background: #005a9e; }
 
-/* Explorer */
-.explorer { display: grid; grid-template-columns: 150px 1fr; height: 100%; }
-.side { background: #f3f3f3; border-right: 1px solid #e0e0e0; padding: 6px; overflow-y: auto; }
-.side-item {
-  padding: 6px 8px; font-size: 12px; border-radius: 2px;
-  cursor: pointer; display: flex; gap: 7px; align-items: center;
-}
-.side-item:hover, .side-item.active { background: #cce8ff; }
 .files {
-  padding: 12px; display: grid;
-  grid-template-columns: repeat(auto-fill, 90px); gap: 6px; align-content: start;
+  padding: 14px; display: grid;
+  grid-template-columns: repeat(auto-fill, 90px); gap: 8px;
 }
-.file {
-  text-align: center; padding: 8px 3px; border-radius: 2px;
-  font-size: 11px; cursor: pointer;
-}
-.file:hover { background: #cce8ff; outline: 1px solid #99d1ff; }
-.file span { display: block; font-size: 30px; margin-bottom: 2px; }
-.status {
-  padding: 2px 10px; border-top: 1px solid #ddd;
-  font-size: 11px; color: #555; background: #f5f5f5; flex-shrink: 0;
+.file { text-align: center; padding: 8px 4px; font-size: 12px; cursor: pointer; border-radius: 3px; }
+.file:hover { background: #cce8ff; }
+.file span { display: block; font-size: 30px; margin-bottom: 3px; }
+
+.notepad {
+  width: 100%; height: 100%; border: none; padding: 12px;
+  font: 14px Consolas, monospace; resize: none; outline: none;
 }
 
-/* Apps */
-.notepad { width: 100%; height: 100%; padding: 10px; font: 13px Consolas, monospace; resize: none; border: 0; }
-.browser { display: flex; flex-direction: column; height: 100%; }
-.browser iframe { flex: 1; border: 0; width: 100%; }
 .terminal {
   height: 100%; background: #0c0c0c; color: #ccc;
   padding: 10px; font: 13px Consolas, monospace; overflow: auto;
 }
-.terminal input { background: transparent; color: #fff; width: 60%; font: inherit; }
-.terminal .prompt { color: #16c60c; }
+.terminal input {
+  background: transparent; border: none; color: #fff;
+  outline: none; width: 70%; font: inherit;
+}
+.prompt { color: #16c60c; }
 
-/* Calculator */
-.calc { display: grid; grid-template-columns: repeat(4,1fr); gap: 3px; padding: 10px; max-width: 250px; margin: 10px auto; }
+.calc {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+  padding: 12px; max-width: 240px; margin: 12px auto;
+}
 .calc-display {
-  grid-column: 1/-1; background: #1a1a1a; color: #fff;
-  font: 24px Consolas, monospace; padding: 12px; text-align: right; min-height: 46px;
+  grid-column: 1 / -1; background: #1a1a1a; color: #fff;
+  font: 22px Consolas, monospace; padding: 12px; text-align: right;
 }
-.calc button { padding: 13px; font-size: 15px; background: #f0f0f0; border-radius: 2px; }
-.calc button:hover { background: #e0e0e0; }
-.calc button.op { background: #e8e8e8; }
-.calc button.eq { background: var(--accent); color: #fff; }
+.calc button {
+  padding: 14px; font-size: 16px; border: none; background: #eee;
+  cursor: pointer; border-radius: 3px;
+}
+.calc button:hover { background: #ddd; }
+.calc .eq { background: #0078d4; color: #fff; }
 
-/* Remote Desktop */
-.rdp { padding: 20px; max-width: 500px; margin: 0 auto; }
-.rdp h2 { font-weight: 400; font-size: 20px; margin-bottom: 6px; }
-.rdp p { font-size: 13px; color: #555; line-height: 1.45; margin-bottom: 14px; }
-.rdp label { display: block; font-size: 12px; margin: 10px 0 3px; color: #333; }
-.rdp input {
-  width: 100%; padding: 7px 10px; border: 1px solid #ccc; background: #fff; font-size: 13px;
+.rdp-box { padding: 20px; max-width: 460px; margin: 0 auto; }
+.rdp-box h2 { font-weight: 400; margin-bottom: 8px; }
+.rdp-box p { font-size: 13px; color: #555; margin-bottom: 14px; line-height: 1.4; }
+.rdp-box label { display: block; font-size: 12px; margin: 10px 0 3px; }
+.rdp-box input {
+  width: 100%; padding: 7px 10px; border: 1px solid #ccc; font-size: 13px;
 }
-.rdp-actions { margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap; }
-.rdp-info {
-  margin-top: 18px; padding: 12px 14px;
-  background: #e8f4fc; border-left: 3px solid var(--accent);
-  font-size: 12px; color: #0d47a1; line-height: 1.5;
-}
-.rdp-info b { display: block; margin-bottom: 4px; }
-
-/* Settings & ISO */
-.settings, .iso-content { padding: 16px; }
-.card {
-  border: 1px solid #e0e0e0; padding: 12px 14px; margin: 10px 0;
-  background: #fafafa; border-radius: 2px;
-}
-.card h3 { font-size: 13px; font-weight: 500; margin-bottom: 6px; }
-.badge {
-  display: inline-block; padding: 2px 7px; border-radius: 10px;
-  background: #e3f2fd; color: #1565c0; font-size: 10px;
-}
-.iso-drop {
-  border: 2px dashed #bbb; border-radius: 4px; padding: 20px;
-  text-align: center; margin: 10px 0; background: #fafafa;
+.info-box {
+  margin-top: 16px; padding: 12px; background: #e8f4fc;
+  border-left: 3px solid #0078d4; font-size: 12px; color: #0d47a1; line-height: 1.5;
 }
 
-/* ===== TASKBAR ===== */
+/* Taskbar */
 #taskbar {
-  position: absolute; left: 0; right: 0; bottom: 0; height: var(--taskbar-h);
-  background: var(--taskbar); display: flex; align-items: center;
-  color: #fff; z-index: 20000;
+  position: absolute; left: 0; right: 0; bottom: 0; height: 48px;
+  background: #1a1a1a; display: flex; align-items: center; color: #fff; z-index: 5000;
 }
 .start-btn {
-  width: 48px; height: 100%; color: #fff; font-size: 18px;
-  transition: background .1s;
+  width: 48px; height: 48px; border: none; background: none;
+  color: #fff; font-size: 20px; cursor: pointer;
 }
-.start-btn:hover, .start-btn.active { background: rgba(255,255,255,.1); }
-.search {
-  height: 32px; width: min(200px, 26vw); margin-left: 1px;
-  padding: 0 10px; background: #2d2d2d; color: #fff; font-size: 12px;
-}
-.search::placeholder { color: #999; }
-.tasks { display: flex; height: 100%; margin-left: 3px; }
+.start-btn:hover, .start-btn.active { background: rgba(255,255,255,0.12); }
+.tasks { display: flex; height: 100%; margin-left: 4px; }
 .task {
-  min-width: 44px; height: 100%; color: #fff; font-size: 16px;
-  position: relative; transition: background .1s;
+  min-width: 44px; height: 48px; border: none; background: none;
+  color: #fff; font-size: 17px; cursor: pointer; position: relative;
 }
-.task:hover { background: rgba(255,255,255,.08); }
+.task:hover { background: rgba(255,255,255,0.1); }
 .task.active::after {
-  content: ''; position: absolute; bottom: 0; left: 22%; right: 22%;
-  height: 2px; background: var(--accent);
+  content: ""; position: absolute; bottom: 0; left: 20%; right: 20%;
+  height: 3px; background: #0078d4;
 }
 .tray {
-  margin-left: auto; display: flex; align-items: center;
-  gap: 8px; padding: 0 10px; font-size: 12px;
+  margin-left: auto; padding: 0 12px; font-size: 12px;
+  display: flex; align-items: center; gap: 10px;
 }
-.clock { text-align: right; line-height: 13px; font-size: 11px; }
+.clock { text-align: right; line-height: 14px; font-size: 11px; }
 
-/* ===== START MENU ===== */
+/* Start Menu */
 #startmenu {
-  position: absolute; bottom: var(--taskbar-h); left: 0;
-  width: min(560px, 100vw); height: min(500px, calc(100vh - var(--taskbar-h)));
-  background: #1c1c1c; color: #fff; display: none; z-index: 25000;
-  box-shadow: 2px 0 20px #0008;
+  position: absolute; bottom: 48px; left: 0;
+  width: min(320px, 90vw); background: #1c1c1c; color: #fff;
+  display: none; z-index: 6000; padding: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
 }
-#startmenu.open { display: flex; animation: startIn .15s ease-out; }
-@keyframes startIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: none; }
+#startmenu.open { display: block; }
+.start-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; cursor: pointer; border-radius: 4px; font-size: 14px;
 }
-.start-side {
-  width: 48px; background: #111; display: flex; flex-direction: column;
-  justify-content: flex-end; padding-bottom: 6px; flex-shrink: 0;
-}
-.start-side button {
-  width: 48px; height: 42px; color: #bbb; font-size: 15px;
-}
-.start-side button:hover { background: #2a2a2a; color: #fff; }
-.start-main { flex: 1; padding: 12px 14px; overflow-y: auto; }
-.start-search {
-  width: 100%; padding: 7px 10px; margin-bottom: 10px;
-  background: #2a2a2a; color: #fff; font-size: 12px;
-}
-.start-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 5px;
-}
-.tile {
-  height: 78px; color: #fff; text-align: left; padding: 8px;
-  font-size: 11px; transition: filter .1s;
-}
-.tile:hover { filter: brightness(1.12); }
-.tile small { display: block; margin-top: 3px; opacity: .7; font-size: 10px; }
-.tile.blue { background: #0078d4; }
-.tile.green { background: #107c10; }
-.tile.orange { background: #ca5010; }
-.tile.purple { background: #5c2d91; }
-.tile.teal { background: #008272; }
-.tile.red { background: #c42b1c; }
-.tile.dark { background: #2d2d2d; }
+.start-item:hover { background: #333; }
+.start-item span { font-size: 20px; }
 
-/* Context & Toast */
-#context {
-  position: absolute; display: none; background: #fff;
-  border: 1px solid #ccc; box-shadow: 0 3px 12px #0003;
-  z-index: 30000; width: 180px; font-size: 12px;
-}
-.ctx { padding: 7px 12px; cursor: pointer; }
-.ctx:hover { background: #cce8ff; }
-.ctx.sep { border-top: 1px solid #eee; }
-.toast {
-  position: absolute; right: 12px; bottom: 56px;
-  background: #1f1f1f; color: #fff; padding: 10px 14px;
-  border-radius: 2px; display: none; z-index: 35000; font-size: 12px;
-  box-shadow: 0 4px 16px #0005; max-width: 280px;
+/* Toast */
+#toast {
+  position: absolute; right: 12px; bottom: 60px;
+  background: #222; color: #fff; padding: 10px 16px;
+  border-radius: 4px; display: none; z-index: 7000; font-size: 13px;
 }
 
-@media (max-width: 700px) {
-  .window { width: 97vw; height: 80vh; left: 1.5vw !important; top: 1vh !important; }
-  .search { width: 100px; }
-  .explorer { grid-template-columns: 1fr; }
-  .side { display: none; }
-  .tray span:not(.clock) { display: none; }
-  .icon { width: 68px; font-size: 10px; }
-  .icon .ico { font-size: 24px; }
-  .login-time { font-size: 48px; }
+@media (max-width: 600px) {
+  .window { width: 96vw; height: 80vh; left: 2vw !important; top: 2vh !important; }
+  .login-time { font-size: 42px; }
 }
 </style>
 </head>
 <body>
 
-<!-- ===== TELA DE LOGIN (estilo Windows 10) ===== -->
+<!-- LOGIN -->
 <div id="login">
   <div class="login-time" id="loginTime">00:00</div>
-  <div class="login-date" id="loginDate"></div>
-  <div class="login-user">
-    <div class="login-avatar">👤</div>
-    <div class="login-name">User</div>
-    <input class="login-input" id="senha" type="password" placeholder="Senha" autocomplete="off">
-    <button class="login-btn" onclick="entrar()">Entrar</button>
-    <span class="login-skip" onclick="entrar(true)">Pular login</span>
-  </div>
+  <div class="login-date" id="loginDate">carregando...</div>
+  <div class="login-avatar">👤</div>
+  <div class="login-name">User</div>
+  <button class="login-btn" onclick="entrar()">Entrar</button>
+  <div class="login-skip" onclick="entrar()">Pular</div>
 </div>
 
-<!-- ===== DESKTOP ===== -->
+<!-- DESKTOP -->
 <div id="desktop">
   <div class="icons">
-    <div class="icon" ondblclick="openWin('explorer')" ontouchend="tap(event,'explorer')"><span class="ico">🖥️</span>Este PC</div>
-    <div class="icon" ondblclick="openWin('rdp')" ontouchend="tap(event,'rdp')"><span class="ico">🪟</span>Windows Real</div>
-    <div class="icon" ondblclick="openWin('browser')" ontouchend="tap(event,'browser')"><span class="ico">🌐</span>Edge</div>
-    <div class="icon" ondblclick="openWin('notepad')" ontouchend="tap(event,'notepad')"><span class="ico">📝</span>Bloco de Notas</div>
-    <div class="icon" ondblclick="openWin('calc')" ontouchend="tap(event,'calc')"><span class="ico">🔢</span>Calculadora</div>
-    <div class="icon" ondblclick="openWin('cmd')" ontouchend="tap(event,'cmd')"><span class="ico">⌨️</span>CMD</div>
-    <div class="icon" ondblclick="openWin('iso')" ontouchend="tap(event,'iso')"><span class="ico">💿</span>ISO</div>
-    <div class="icon" ondblclick="openWin('settings')" ontouchend="tap(event,'settings')"><span class="ico">⚙️</span>Configurações</div>
+    <div class="icon" onclick="openWin('explorer')"><span>🖥️</span>Este PC</div>
+    <div class="icon" onclick="openWin('rdp')"><span>🪟</span>Windows Real</div>
+    <div class="icon" onclick="openWin('browser')"><span>🌐</span>Edge</div>
+    <div class="icon" onclick="openWin('notepad')"><span>📝</span>Notas</div>
+    <div class="icon" onclick="openWin('calc')"><span>🔢</span>Calculadora</div>
+    <div class="icon" onclick="openWin('cmd')"><span>⌨️</span>CMD</div>
+    <div class="icon" onclick="openWin('settings')"><span>⚙️</span>Config</div>
   </div>
 
-  <!-- EXPLORER -->
-  <div class="window" id="explorer" style="left:40px;top:25px">
-    <div class="titlebar" data-win="explorer">
+  <!-- Explorer -->
+  <div class="window" id="explorer" style="left:50px;top:30px">
+    <div class="titlebar">
       <b>📁 Este Computador</b>
       <div class="controls">
         <button onclick="minWin('explorer')">—</button>
@@ -369,33 +229,20 @@ input, textarea { user-select: text; }
       </div>
     </div>
     <div class="win-body">
-      <div class="toolbar"><input value="Este Computador" readonly></div>
-      <div class="explorer">
-        <div class="side">
-          <div class="side-item active">🏠 Acesso rápido</div>
-          <div class="side-item">🖥️ Este PC</div>
-          <div class="side-item">📄 Documentos</div>
-          <div class="side-item">⬇️ Downloads</div>
-          <div class="side-item">🖼️ Imagens</div>
-          <div class="side-item" onclick="openWin('iso')">💿 ISO</div>
-        </div>
-        <div class="files">
-          <div class="file" onclick="openWin('rdp')"><span>🪟</span>Windows Real</div>
-          <div class="file" onclick="openWin('iso')"><span>💿</span>ISO Windows</div>
-          <div class="file" onclick="openWin('notepad')"><span>📄</span>Documentos</div>
-          <div class="file"><span>📁</span>Downloads</div>
-          <div class="file"><span>🖼️</span>Imagens</div>
-          <div class="file"><span>🎵</span>Músicas</div>
-        </div>
+      <div class="files">
+        <div class="file" onclick="openWin('rdp')"><span>🪟</span>Windows Real</div>
+        <div class="file" onclick="openWin('notepad')"><span>📄</span>Documentos</div>
+        <div class="file"><span>📁</span>Downloads</div>
+        <div class="file"><span>🖼️</span>Imagens</div>
+        <div class="file"><span>🎵</span>Músicas</div>
       </div>
     </div>
-    <div class="status">6 itens</div>
   </div>
 
-  <!-- WINDOWS REAL -->
-  <div class="window" id="rdp" style="left:70px;top:35px">
-    <div class="titlebar" data-win="rdp">
-      <b>🪟 Windows Real — Área de Trabalho Remota</b>
+  <!-- Windows Real -->
+  <div class="window" id="rdp" style="left:70px;top:40px">
+    <div class="titlebar">
+      <b>🪟 Windows Real</b>
       <div class="controls">
         <button onclick="minWin('rdp')">—</button>
         <button onclick="maxWin('rdp')">□</button>
@@ -403,42 +250,34 @@ input, textarea { user-select: text; }
       </div>
     </div>
     <div class="win-body">
-      <div class="rdp">
-        <h2>Conectar a um Windows de verdade</h2>
-        <p>
-          Esta simulação roda no navegador. Para usar um <strong>Windows 10/11 real</strong>,
-          conecte-se a um PC, VPS ou Cloud PC.
-        </p>
+      <div class="rdp-box">
+        <h2>Conectar a um Windows real</h2>
+        <p>Esta é uma simulação. Para usar Windows de verdade, conecte em um PC ou na nuvem.</p>
 
-        <label>Endereço do computador (IP ou nome)</label>
-        <input id="rdpHost" placeholder="Ex: 192.168.0.10  ou  meu-pc.ddns.net">
+        <label>Endereço do PC (IP)</label>
+        <input id="rdpHost" placeholder="Ex: 192.168.0.10">
 
-        <label>Porta (padrão: 3389)</label>
-        <input id="rdpPort" type="number" value="3389">
+        <label>Porta</label>
+        <input id="rdpPort" value="3389" type="number">
 
-        <label>Usuário (opcional)</label>
-        <input id="rdpUser" placeholder="Administrador">
-
-        <div class="rdp-actions">
-          <button class="btn primary" onclick="connectRDP()">Conectar agora</button>
+        <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap">
+          <button class="btn primary" onclick="conectar()">Conectar</button>
           <button class="btn" onclick="window.open('https://www.microsoft.com/pt-br/windows/windows-365','_blank')">Windows 365</button>
-          <button class="btn" onclick="window.open('https://rdweb.wvd.microsoft.com/arm/webclient/index.html','_blank')">Azure Virtual Desktop</button>
         </div>
 
-        <div class="rdp-info">
-          <b>Como ter um Windows real no celular:</b>
-          1. No PC Windows: Configurações → Sistema → Área de Trabalho Remota → Ativar<br>
-          2. Ou alugue um VPS com Windows (Contabo, Azure, etc.)<br>
-          3. No celular instale o app oficial <b>“Área de Trabalho Remota”</b> da Microsoft<br>
-          4. Ou use Windows 365 / qualquer Cloud PC
+        <div class="info-box">
+          <b>Como usar Windows real no celular:</b><br>
+          1. Ative Área de Trabalho Remota no seu PC Windows<br>
+          2. Instale o app "Área de Trabalho Remota" da Microsoft no celular<br>
+          3. Ou use Windows 365 (Windows na nuvem)
         </div>
       </div>
     </div>
   </div>
 
-  <!-- EDGE -->
-  <div class="window" id="browser" style="left:100px;top:40px">
-    <div class="titlebar" data-win="browser">
+  <!-- Browser -->
+  <div class="window" id="browser" style="left:90px;top:50px">
+    <div class="titlebar">
       <b>🌐 Microsoft Edge</b>
       <div class="controls">
         <button onclick="minWin('browser')">—</button>
@@ -446,19 +285,18 @@ input, textarea { user-select: text; }
         <button class="close" onclick="closeWin('browser')">×</button>
       </div>
     </div>
-    <div class="win-body browser">
+    <div class="win-body" style="display:flex;flex-direction:column">
       <div class="toolbar">
-        <input id="url" value="https://www.microsoft.com" onkeydown="if(event.key==='Enter')go()">
-        <button class="btn" onclick="go()">→</button>
-        <button class="btn" onclick="openExt()">↗</button>
+        <input id="url" value="https://www.microsoft.com" onkeydown="if(event.key==='Enter')navegar()">
+        <button class="btn" onclick="navegar()">Ir</button>
       </div>
-      <iframe id="frame" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+      <iframe id="frame" style="flex:1;border:0;width:100%" src="about:blank"></iframe>
     </div>
   </div>
 
-  <!-- NOTEPAD -->
-  <div class="window" id="notepad" style="left:130px;top:55px">
-    <div class="titlebar" data-win="notepad">
+  <!-- Notepad -->
+  <div class="window" id="notepad" style="left:110px;top:60px">
+    <div class="titlebar">
       <b>📝 Bloco de Notas</b>
       <div class="controls">
         <button onclick="minWin('notepad')">—</button>
@@ -466,14 +304,14 @@ input, textarea { user-select: text; }
         <button class="close" onclick="closeWin('notepad')">×</button>
       </div>
     </div>
-    <div class="win-body" style="padding:0">
-      <textarea class="notepad" id="notes" placeholder="Digite seu texto..."></textarea>
+    <div class="win-body">
+      <textarea class="notepad" id="notes" placeholder="Digite aqui..."></textarea>
     </div>
   </div>
 
-  <!-- CALCULATOR -->
-  <div class="window" id="calc" style="left:160px;top:50px;width:270px;height:390px">
-    <div class="titlebar" data-win="calc">
+  <!-- Calculator -->
+  <div class="window" id="calc" style="left:140px;top:50px;width:260px;height:380px">
+    <div class="titlebar">
       <b>🔢 Calculadora</b>
       <div class="controls">
         <button onclick="minWin('calc')">—</button>
@@ -481,25 +319,25 @@ input, textarea { user-select: text; }
         <button class="close" onclick="closeWin('calc')">×</button>
       </div>
     </div>
-    <div class="win-body" style="display:flex;align-items:center;justify-content:center">
+    <div class="win-body">
       <div class="calc">
         <div class="calc-display" id="cDisp">0</div>
         <button onclick="cClear()">C</button>
         <button onclick="cIn('(')">(</button>
         <button onclick="cIn(')')">)</button>
-        <button class="op" onclick="cIn('/')">÷</button>
+        <button onclick="cIn('/')">÷</button>
         <button onclick="cIn('7')">7</button>
         <button onclick="cIn('8')">8</button>
         <button onclick="cIn('9')">9</button>
-        <button class="op" onclick="cIn('*')">×</button>
+        <button onclick="cIn('*')">×</button>
         <button onclick="cIn('4')">4</button>
         <button onclick="cIn('5')">5</button>
         <button onclick="cIn('6')">6</button>
-        <button class="op" onclick="cIn('-')">−</button>
+        <button onclick="cIn('-')">−</button>
         <button onclick="cIn('1')">1</button>
         <button onclick="cIn('2')">2</button>
         <button onclick="cIn('3')">3</button>
-        <button class="op" onclick="cIn('+')">+</button>
+        <button onclick="cIn('+')">+</button>
         <button onclick="cIn('0')" style="grid-column:span 2">0</button>
         <button onclick="cIn('.')">.</button>
         <button class="eq" onclick="cEval()">=</button>
@@ -508,57 +346,25 @@ input, textarea { user-select: text; }
   </div>
 
   <!-- CMD -->
-  <div class="window" id="cmd" style="left:180px;top:60px">
-    <div class="titlebar" data-win="cmd" style="background:#0c0c0c;color:#ccc;border-bottom-color:#222">
+  <div class="window" id="cmd" style="left:160px;top:70px">
+    <div class="titlebar" style="background:#111;color:#ccc">
       <b>⌨️ Prompt de Comando</b>
       <div class="controls">
-        <button style="color:#aaa" onclick="minWin('cmd')">—</button>
-        <button style="color:#aaa" onclick="maxWin('cmd')">□</button>
-        <button class="close" style="color:#aaa" onclick="closeWin('cmd')">×</button>
+        <button style="color:#ccc" onclick="minWin('cmd')">—</button>
+        <button style="color:#ccc" onclick="maxWin('cmd')">□</button>
+        <button class="close" style="color:#ccc" onclick="closeWin('cmd')">×</button>
       </div>
     </div>
     <div class="win-body terminal" id="termout">
-      <div>Microsoft Windows [Versão 10.0.19045.3800]</div>
-      <div>(c) Microsoft Corporation. Todos os direitos reservados.</div><br>
-      <span class="prompt">C:\Users\User&gt; </span><input id="term" onkeydown="cmdKey(event)" autocomplete="off">
+      <div>Microsoft Windows [Versão 10.0.19045]</div>
+      <div>(c) Microsoft Corporation.</div><br>
+      <span class="prompt">C:\Users\User&gt; </span><input id="term" onkeydown="cmdKey(event)">
     </div>
   </div>
 
-  <!-- ISO -->
-  <div class="window" id="iso" style="left:90px;top:30px">
-    <div class="titlebar" data-win="iso">
-      <b>💿 Gerenciador de ISO</b>
-      <div class="controls">
-        <button onclick="minWin('iso')">—</button>
-        <button onclick="maxWin('iso')">□</button>
-        <button class="close" onclick="closeWin('iso')">×</button>
-      </div>
-    </div>
-    <div class="win-body iso-content">
-      <h2 style="font-weight:400;font-size:18px;margin-bottom:8px">Windows ISO</h2>
-      <p style="font-size:13px;color:#555;margin-bottom:12px">Baixe a ISO oficial. A licença é responsabilidade do usuário.</p>
-      <div class="card">
-        <button class="btn primary" onclick="window.open('https://www.microsoft.com/software-download/windows11','_blank')">Windows 11 ISO</button>
-        <button class="btn" style="margin-left:6px" onclick="window.open('https://www.microsoft.com/software-download/windows10ISO','_blank')">Windows 10 ISO</button>
-      </div>
-      <div class="iso-drop">
-        <b>Selecionar ISO local</b><br><br>
-        <input type="file" id="isoFile" accept=".iso">
-        <div id="isoInfo" style="margin-top:8px;font-size:12px;color:#666">Nenhuma ISO selecionada</div>
-      </div>
-      <div class="card">
-        <span class="badge">Importante</span>
-        <p style="font-size:12px;margin-top:6px;color:#555">
-          O navegador não executa a ISO. Para Windows real use a janela
-          <b>Windows Real</b> ou a versão Android com QEMU.
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- SETTINGS -->
-  <div class="window" id="settings" style="left:200px;top:45px">
-    <div class="titlebar" data-win="settings">
+  <!-- Settings -->
+  <div class="window" id="settings" style="left:180px;top:55px">
+    <div class="titlebar">
       <b>⚙️ Configurações</b>
       <div class="controls">
         <button onclick="minWin('settings')">—</button>
@@ -566,57 +372,32 @@ input, textarea { user-select: text; }
         <button class="close" onclick="closeWin('settings')">×</button>
       </div>
     </div>
-    <div class="win-body settings">
-      <h2 style="font-weight:400;font-size:18px">Configurações</h2>
-      <div class="card">
-        <h3>Sobre o web_app</h3>
-        <p style="font-size:12px;color:#555">Simulação realista do Windows 10 no navegador + suporte a Área de Trabalho Remota.</p>
-        <span class="badge">V4</span>
-      </div>
-      <div class="card">
-        <h3>Dados locais</h3>
-        <button class="btn" onclick="clearData()">Limpar dados salvos</button>
-      </div>
+    <div class="win-body" style="padding:20px">
+      <h2 style="font-weight:400;margin-bottom:10px">Configurações</h2>
+      <p style="font-size:13px;color:#555;margin-bottom:12px">web_app — Simulação do Windows 10</p>
+      <button class="btn" onclick="localStorage.clear(); location.reload()">Limpar dados</button>
     </div>
   </div>
 </div>
 
 <!-- START MENU -->
 <div id="startmenu">
-  <div class="start-side">
-    <button title="Us">👤</button>
-    <button title="Configurações" onclick="openWin('settings');hideStart()">⚙️</button>
-    <button title="Desligar" onclick="location.reload()">⏻</button>
-  </div>
-  <div class="start-main">
-    <input class="start-search" id="startSearch" placeholder="Pesquisar aplicativos, configurações..." oninput="filterTiles()">
-    <div class="start-grid" id="startGrid">
-      <button class="tile blue" data-name="este computador explorador" onclick="openWin('explorer')">📁<br>Este PC<small>Arquivos</small></button>
-      <button class="tile red" data-name="windows real remoto rdp" onclick="openWin('rdp')">🪟<br>Windows Real<small>Área Remota</small></button>
-      <button class="tile blue" data-name="edge navegador" onclick="openWin('browser')">🌐<br>Edge<small>Navegador</small></button>
-      <button class="tile green" data-name="bloco de notas" onclick="openWin('notepad')">📝<br>Notas<small>Texto</small></button>
-      <button class="tile orange" data-name="calculadora" onclick="openWin('calc')">🔢<br>Calculadora<small>Cálculos</small></button>
-      <button class="tile teal" data-name="cmd terminal prompt" onclick="openWin('cmd')">⌨️<br>CMD<small>Terminal</small></button>
-      <button class="tile purple" data-name="iso windows" onclick="openWin('iso')">💿<br>ISO<small>Windows</small></button>
-      <button class="tile dark" data-name="configurações" onclick="openWin('settings')">⚙️<br>Config<small>Sistema</small></button>
-    </div>
-  </div>
+  <div class="start-item" onclick="openWin('explorer'); hideStart()"><span>🖥️</span> Este PC</div>
+  <div class="start-item" onclick="openWin('rdp'); hideStart()"><span>🪟</span> Windows Real</div>
+  <div class="start-item" onclick="openWin('browser'); hideStart()"><span>🌐</span> Edge</div>
+  <div class="start-item" onclick="openWin('notepad'); hideStart()"><span>📝</span> Bloco de Notas</div>
+  <div class="start-item" onclick="openWin('calc'); hideStart()"><span>🔢</span> Calculadora</div>
+  <div class="start-item" onclick="openWin('cmd'); hideStart()"><span>⌨️</span> Prompt de Comando</div>
+  <div class="start-item" onclick="openWin('settings'); hideStart()"><span>⚙️</span> Configurações</div>
+  <div class="start-item" onclick="location.reload()"><span>⏻</span> Desligar</div>
 </div>
 
-<!-- CONTEXT MENU -->
-<div id="context">
-  <div class="ctx" onclick="openWin('explorer');hideCtx()">Abrir Este PC</div>
-  <div class="ctx" onclick="openWin('rdp');hideCtx()">Windows Real</div>
-  <div class="ctx" onclick="openWin('notepad');hideCtx()">Bloco de Notas</div>
-  <div class="ctx sep" onclick="location.reload()">Atualizar</div>
-</div>
-
-<div class="toast" id="toast"></div>
+<!-- TOAST -->
+<div id="toast"></div>
 
 <!-- TASKBAR -->
 <div id="taskbar">
   <button class="start-btn" id="startBtn" onclick="toggleStart()">⊞</button>
-  <input class="search" placeholder="Digite aqui para pesquisar" onkeydown="searchKey(event)">
   <div class="tasks">
     <button class="task" data-win="explorer" onclick="openWin('explorer')">📁</button>
     <button class="task" data-win="rdp" onclick="openWin('rdp')">🪟</button>
@@ -626,263 +407,240 @@ input, textarea { user-select: text; }
     <button class="task" data-win="cmd" onclick="openWin('cmd')">⌨️</button>
   </div>
   <div class="tray">
-    <span>🔊</span><span>📶</span>
-    <div class="clock"><span id="time"></span><br><span id="date"></span></div>
+    <div class="clock">
+      <div id="time">00:00</div>
+      <div id="date">01/01/2025</div>
+    </div>
   </div>
 </div>
 
 <script>
-const $ = id => document.getElementById(id);
-let z = 100, maximized = {}, lastTap = 0;
+// ===== UTIL =====
+function $(id) { return document.getElementById(id); }
+let zIndex = 100;
+const maximized = {};
 
-/* ===== LOGIN ===== */
+// ===== LOGIN =====
 function updateLoginClock() {
   const d = new Date();
-  $('loginTime').textContent = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  $('loginTime').textContent = d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
   $('loginDate').textContent = d.toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long'});
 }
 setInterval(updateLoginClock, 1000);
 updateLoginClock();
 
-function entrar(skip) {
-  $('login').classList.add('hide');
-  sessionStorage.setItem('web_app_login', '1');
-  setTimeout(() => { $('login').style.display = 'none'; }, 400);
+function entrar() {
+  $('login').classList.add('hidden');
   toast('Bem-vindo ao Windows');
 }
-$('senha').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
-if (sessionStorage.getItem('web_app_login') === '1') {
-  $('login').style.display = 'none';
-}
 
-/* ===== WINDOW MANAGER ===== */
+// ===== WINDOW MANAGER =====
 function openWin(id) {
   const w = $(id);
   if (!w) return;
-  w.classList.add('open');
+  w.classList.add('show');
   w.style.display = 'flex';
-  w.style.zIndex = ++z;
+  w.style.zIndex = ++zIndex;
   hideStart();
   updateTasks();
-  if (id === 'browser' && $('frame').src === 'about:blank') go();
 }
+
 function closeWin(id) {
   const w = $(id);
-  w.classList.remove('open');
+  if (!w) return;
+  w.classList.remove('show');
   w.style.display = 'none';
   updateTasks();
 }
-function minWin(id) { closeWin(id); }
+
+function minWin(id) {
+  closeWin(id);
+}
+
 function maxWin(id) {
   const w = $(id);
+  if (!w) return;
   if (!maximized[id]) {
-    w.dataset.old = JSON.stringify({left:w.style.left, top:w.style.top, width:w.style.width, height:w.style.height});
+    w.dataset.old = JSON.stringify({
+      left: w.style.left,
+      top: w.style.top,
+      width: w.style.width,
+      height: w.style.height
+    });
     w.classList.add('maximized');
     maximized[id] = true;
   } else {
-    Object.assign(w.style, JSON.parse(w.dataset.old || '{}'));
+    const old = JSON.parse(w.dataset.old || '{}');
+    w.style.left = old.left || '';
+    w.style.top = old.top || '';
+    w.style.width = old.width || '';
+    w.style.height = old.height || '';
     w.classList.remove('maximized');
     maximized[id] = false;
   }
 }
+
 function updateTasks() {
-  document.querySelectorAll('.task').forEach(t => {
-    const w = $(t.dataset.win);
-    t.classList.toggle('active', w && w.classList.contains('open') && w.style.display !== 'none');
+  document.querySelectorAll('.task').forEach(function(btn) {
+    const id = btn.getAttribute('data-win');
+    const w = $(id);
+    if (w && w.classList.contains('show')) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
   });
 }
 
-/* Drag */
-document.querySelectorAll('.window').forEach(w => {
-  w.addEventListener('pointerdown', () => w.style.zIndex = ++z);
-  const bar = w.querySelector('.titlebar');
-  let drag = false, sx, sy, ox, oy;
-  bar.addEventListener('pointerdown', e => {
-    if (maximized[w.id] || e.target.closest('.controls')) return;
-    drag = true; sx = e.clientX; sy = e.clientY; ox = w.offsetLeft; oy = w.offsetTop;
+// Drag windows
+document.querySelectorAll('.window').forEach(function(win) {
+  const bar = win.querySelector('.titlebar');
+  let dragging = false, startX, startY, origX, origY;
+
+  bar.addEventListener('pointerdown', function(e) {
+    if (maximized[win.id] || e.target.closest('.controls')) return;
+    dragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    origX = win.offsetLeft;
+    origY = win.offsetTop;
+    win.style.zIndex = ++zIndex;
     bar.setPointerCapture(e.pointerId);
   });
-  bar.addEventListener('pointermove', e => {
-    if (!drag) return;
-    w.style.left = Math.max(0, ox + e.clientX - sx) + 'px';
-    w.style.top = Math.max(0, oy + e.clientY - sy) + 'px';
+
+  bar.addEventListener('pointermove', function(e) {
+    if (!dragging) return;
+    win.style.left = Math.max(0, origX + e.clientX - startX) + 'px';
+    win.style.top = Math.max(0, origY + e.clientY - startY) + 'px';
   });
-  bar.addEventListener('pointerup', () => drag = false);
+
+  bar.addEventListener('pointerup', function() {
+    dragging = false;
+  });
 });
 
-/* Touch icons */
-function tap(e, id) {
-  const now = Date.now();
-  if (now - lastTap < 300) { e.preventDefault(); openWin(id); }
-  lastTap = now;
-}
-
-/* Start Menu */
+// ===== START MENU =====
 function toggleStart() {
-  const s = $('startmenu'), b = $('startBtn');
-  if (s.classList.contains('open')) {
-    s.classList.remove('open'); s.style.display = 'none'; b.classList.remove('active');
+  const menu = $('startmenu');
+  const btn = $('startBtn');
+  if (menu.classList.contains('open')) {
+    menu.classList.remove('open');
+    btn.classList.remove('active');
   } else {
-    s.classList.add('open'); s.style.display = 'flex'; b.classList.add('active');
-    $('startSearch').focus();
+    menu.classList.add('open');
+    btn.classList.add('active');
   }
 }
+
 function hideStart() {
   $('startmenu').classList.remove('open');
-  $('startmenu').style.display = 'none';
   $('startBtn').classList.remove('active');
 }
 
-/* Context */
-function hideCtx() { $('context').style.display = 'none'; }
-document.addEventListener('contextmenu', e => {
-  e.preventDefault();
-  const c = $('context');
-  c.style.left = Math.min(e.clientX, innerWidth - 190) + 'px';
-  c.style.top = Math.min(e.clientY, innerHeight - 140) + 'px';
-  c.style.display = 'block';
-});
-document.addEventListener('click', e => {
-  if (!e.target.closest('#context')) hideCtx();
-  if (!e.target.closest('#startmenu') && !e.target.closest('#startBtn')) hideStart();
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('#startmenu') && !e.target.closest('#startBtn')) {
+    hideStart();
+  }
 });
 
-/* Clock */
-function tick() {
+// ===== CLOCK =====
+function updateClock() {
   const d = new Date();
-  $('time').textContent = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-  $('date').textContent = d.toLocaleDateString();
+  $('time').textContent = d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+  $('date').textContent = d.toLocaleDateString('pt-BR');
 }
-setInterval(tick, 1000); tick();
+setInterval(updateClock, 1000);
+updateClock();
 
-/* Notes */
-const notes = $('notes');
-notes.value = localStorage.getItem('web_app_notes') || '';
-notes.addEventListener('input', () => localStorage.setItem('web_app_notes', notes.value));
+// ===== NOTES =====
+var notesEl = $('notes');
+notesEl.value = localStorage.getItem('notes') || '';
+notesEl.addEventListener('input', function() {
+  localStorage.setItem('notes', notesEl.value);
+});
 
-/* Browser */
-function go() {
-  let u = $('url').value.trim();
+// ===== BROWSER =====
+function navegar() {
+  var u = $('url').value.trim();
   if (!u) return;
-  if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+  if (u.indexOf('http') !== 0) u = 'https://' + u;
   $('url').value = u;
-  try { $('frame').src = u; } catch(e) {}
-}
-function openExt() {
-  let u = $('url').value.trim();
-  if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
-  window.open(u, '_blank', 'noopener');
+  $('frame').src = u;
 }
 
-/* Calculator */
-let cExpr = '';
+// ===== CALCULATOR =====
+var calcExpr = '';
 function cIn(v) {
-  if (cExpr === '0' && v !== '.') cExpr = '';
-  cExpr += v;
-  $('cDisp').textContent = cExpr;
+  if (calcExpr === '0' && v !== '.') calcExpr = '';
+  calcExpr += v;
+  $('cDisp').textContent = calcExpr;
 }
-function cClear() { cExpr = ''; $('cDisp').textContent = '0'; }
+function cClear() {
+  calcExpr = '';
+  $('cDisp').textContent = '0';
+}
 function cEval() {
   try {
-    const r = Function('"use strict";return(' + cExpr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-') + ')')();
-    cExpr = String(r);
-    $('cDisp').textContent = cExpr;
-  } catch { $('cDisp').textContent = 'Erro'; cExpr = ''; }
+    var result = Function('return (' + calcExpr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-') + ')')();
+    calcExpr = String(result);
+    $('cDisp').textContent = calcExpr;
+  } catch(e) {
+    $('cDisp').textContent = 'Erro';
+    calcExpr = '';
+  }
 }
 
-/* CMD */
+// ===== CMD =====
 function cmdKey(e) {
   if (e.key !== 'Enter') return;
-  const v = e.target.value.trim();
-  const o = $('termout');
-  const add = t => {
-    const d = document.createElement('div');
-    d.textContent = t;
-    o.insertBefore(d, o.lastChild);
-  };
-  if (v === 'help') add('help  clear  cls  date  time  ver  dir  about');
-  else if (v === 'clear' || v === 'cls') {
-    o.innerHTML = '<span class="prompt">C:\\Users\\User&gt; </span><input id="term" onkeydown="cmdKey(event)" autocomplete="off">';
-    $('term').focus(); e.target.value = ''; return;
+  var v = e.target.value.trim();
+  var out = $('termout');
+  var line = document.createElement('div');
+
+  if (v === 'help') {
+    line.textContent = 'Comandos: help, cls, date, time, ver, dir';
+  } else if (v === 'cls' || v === 'clear') {
+    out.innerHTML = '<span class="prompt">C:\\Users\\User&gt; </span><input id="term" onkeydown="cmdKey(event)">';
+    $('term').focus();
+    e.target.value = '';
+    return;
+  } else if (v === 'date') {
+    line.textContent = new Date().toLocaleDateString('pt-BR');
+  } else if (v === 'time') {
+    line.textContent = new Date().toLocaleTimeString('pt-BR');
+  } else if (v === 'ver') {
+    line.textContent = 'Microsoft Windows [Versão 10.0.19045]';
+  } else if (v === 'dir') {
+    line.textContent = 'Diretório de C:\\Users\\User';
+  } else if (v) {
+    line.textContent = "'" + v + "' não é reconhecido como um comando interno ou externo.";
   }
-  else if (v === 'date') add(new Date().toLocaleDateString());
-  else if (v === 'time') add(new Date().toLocaleTimeString());
-  else if (v === 'ver') add('Microsoft Windows [Versão 10.0.19045.3800]');
-  else if (v === 'dir') add(' Diretório de C:\\Users\\User\n\n23/10/2025  14:30    <DIR>          Documents\n23/10/2025  14:30    <DIR>          Downloads\n               0 arquivo(s)');
-  else if (v === 'about') add('web_app V4 — Simulação Windows 10');
-  else if (v) add('\'' + v + '\' não é reconhecido como um comando interno\nou externo, um programa operável ou um arquivo em lotes.');
+
+  if (v) out.insertBefore(line, out.lastChild);
   e.target.value = '';
-  o.scrollTop = o.scrollHeight;
+  out.scrollTop = out.scrollHeight;
 }
 
-/* Search */
-function searchKey(e) {
-  if (e.key !== 'Enter') return;
-  const q = e.target.value.toLowerCase();
-  if (q.includes('real') || q.includes('remoto') || q.includes('rdp')) openWin('rdp');
-  else if (q.includes('iso')) openWin('iso');
-  else if (q.includes('nota')) openWin('notepad');
-  else if (q.includes('calc')) openWin('calc');
-  else if (q.includes('cmd') || q.includes('prompt')) openWin('cmd');
-  else if (q.includes('config')) openWin('settings');
-  else if (q.includes('este') || q.includes('arquivo') || q.includes('explorer')) openWin('explorer');
-  else if (q.includes('edge') || q.includes('web') || q.includes('naveg')) openWin('browser');
-  else toast('Nenhum resultado encontrado');
-  e.target.value = '';
-}
-function filterTiles() {
-  const q = $('startSearch').value.toLowerCase();
-  document.querySelectorAll('#startGrid .tile').forEach(t => {
-    t.style.display = t.dataset.name.includes(q) ? 'block' : 'none';
-  });
+// ===== RDP =====
+function conectar() {
+  var host = $('rdpHost').value.trim();
+  if (!host) {
+    toast('Digite o endereço do PC');
+    return;
+  }
+  var port = $('rdpPort').value || '3389';
+  toast('Use o app Área de Trabalho Remota com: ' + host + ':' + port);
 }
 
-/* RDP */
-function connectRDP() {
-  const host = $('rdpHost').value.trim();
-  if (!host) { toast('Digite o endereço do computador'); return; }
-  const port = $('rdpPort').value || '3389';
-  toast('Use o app “Área de Trabalho Remota” com: ' + host + ':' + port);
-  try { window.location.href = 'rdp://full%20address=s:' + host + ':' + port; } catch(e) {}
-}
-
-/* ISO */
-$('isoFile').addEventListener('change', e => {
-  const f = e.target.files[0];
-  if (!f) return;
-  $('isoInfo').innerHTML = '<b>' + f.name + '</b> — ' + (f.size/1024/1024).toFixed(1) + ' MB';
-  localStorage.setItem('web_app_iso', JSON.stringify({name:f.name, size:f.size}));
-  toast('ISO registrada');
-});
-const savedIso = localStorage.getItem('web_app_iso');
-if (savedIso) {
-  try {
-    const x = JSON.parse(savedIso);
-    $('isoInfo').innerHTML = '<b>' + x.name + '</b> — ' + (x.size/1024/1024).toFixed(1) + ' MB';
-  } catch {}
-}
-
-/* Clear */
-function clearData() {
-  if (!confirm('Limpar todos os dados salvos?')) return;
-  localStorage.clear();
-  notes.value = '';
-  $('isoInfo').textContent = 'Nenhuma ISO selecionada';
-  toast('Dados limpos');
-}
-
-/* Toast */
+// ===== TOAST =====
 function toast(msg) {
-  const el = $('toast');
+  var el = $('toast');
   el.textContent = msg;
   el.style.display = 'block';
-  clearTimeout(window._tt);
-  window._tt = setTimeout(() => el.style.display = 'none', 3000);
-}
-
-/* PWA */
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
+  clearTimeout(window.toastTimer);
+  window.toastTimer = setTimeout(function() {
+    el.style.display = 'none';
+  }, 2800);
 }
 </script>
 </body>

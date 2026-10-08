@@ -1,48 +1,34 @@
-# web_app V3 — Desktop Windows 10 no navegador
+# Windows 10 Web
 
-Desktop web inspirado no **Windows 10**, que funciona no celular (iOS e Android) e no computador.
-
-## O que tem na versão web (V3)
-
-- Interface completa de desktop Windows 10
-- Menu Iniciar com pesquisa
-- Barra de tarefas com relógio
-- Aplicativos:
-  - 🖥️ Explorador de arquivos
-  - 🌐 Navegador
-  - 📝 Bloco de Notas
-  - 🔢 Calculadora
-  - 🎨 Paint (desenho com touch)
-  - ⌨️ Terminal
-  - 💿 Gerenciador de ISO do Windows
-  - ⚙️ Configurações (tema claro/escuro + papéis de parede)
-- Suporte a **PWA** (pode instalar no iPhone e Android)
-- Funciona offline depois da primeira visita
-- Dados salvos localmente no navegador
+Simulação do Windows 10 que roda no navegador (celular e PC).
 
 ## Como usar
 
-1. Abra o arquivo `index.html` no navegador
-2. Ou publique no GitHub Pages / Netlify / Vercel
-3. No celular: abra no Safari (iOS) ou Chrome (Android) → "Adicionar à Tela de Início"
+### Opção 1 – Abrir direto
+Abra o arquivo `index.html` no navegador (Chrome, Safari, Edge...).
 
-## Versão Android (APK)
+### Opção 2 – GitHub Pages
+1. Vá em **Settings → Pages**
+2. Em Source escolha a branch `main` e a pasta `/ (root)`
+3. Salve e espere 1 minuto
+4. Acesse: `https://SEU-USUARIO.github.io/Web_app/`
 
-A pasta `app/` contém o projeto Android que tenta rodar Windows real via QEMU.
-A versão web funciona de forma independente e também pode ser embutida no APK.
+## O que tem
 
-## Estrutura
+- Tela de login estilo Windows 10
+- Desktop com ícones
+- Menu Iniciar
+- Barra de tarefas
+- Aplicativos:
+  - Este PC
+  - Windows Real (conexão RDP)
+  - Edge (navegador)
+  - Bloco de Notas
+  - Calculadora
+  - Prompt de Comando
+  - Configurações
 
-```
-Web_app/
-├── index.html          ← Versão web completa (V3)
-├── manifest.json       ← PWA
-├── sw.js               ← Service Worker (offline)
-├── app/                ← Projeto Android
-└── vm/                 ← Documentação do motor QEMU
-```
+## Importante
 
-## Licença
-
-O código do web_app é livre para uso pessoal.
-Windows é marca registrada da Microsoft. O usuário deve fornecer sua própria ISO e licença.
+Esta é uma **simulação**. Não é um Windows real.
+Para usar Windows de verdade no celular, use a janela **Windows Real** e conecte em um PC ou Windows 365.
