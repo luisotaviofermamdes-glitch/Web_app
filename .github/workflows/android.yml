@@ -17,19 +17,25 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK and NDK
+      - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          accept-android-sdk-licenses: true
 
-      - name: Install Android NDK 29 and native build dependencies
+      - name: Install Android SDK, NDK and native build dependencies
         shell: bash
         run: |
-          sdkmanager --install "platforms;android-35" "build-tools;35.0.0" "ndk;29.0.14206865"
+          set -euxo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager --install "platforms;android-35" "build-tools;35.0.0" "ndk;29.0.14206865" "platform-tools"
           sudo apt-get update
           sudo apt-get install -y ninja-build meson pkg-config python3-pip
 
       - name: Build real QEMU for Android arm64-v8a
         shell: bash
         run: |
+          set -euxo pipefail
           chmod +x vm/qemu/build-real-qemu-android.sh
           vm/qemu/build-real-qemu-android.sh
           QEMU="app/src/main/assets/vm/bin/qemu-system-x86_64"
@@ -50,6 +56,7 @@ jobs:
       - name: Verify APK contains real VM engine and is not the tiny wrapper build
         shell: bash
         run: |
+          set -euxo pipefail
           APK="app/build/outputs/apk/debug/app-debug.apk"
           QEMU="app/src/main/assets/vm/bin/qemu-system-x86_64"
           test -f "$APK"
