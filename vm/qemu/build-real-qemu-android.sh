@@ -27,20 +27,13 @@ ln -s "$NDK" "$HOME/android-ndk-r29"
 cd "$BUILDER"
 chmod +x 2_build_qemu_android.sh
 
-# The upstream helper creates an android-pkg-config shell wrapper inside its
-# build directory. GitHub Actions can fail to execute that generated wrapper
-# with ENOENT even though the file was created. Use the runner's real
-# pkg-config executable instead; the helper still limits the search path to
-# the Android sysroot via PKG_CONFIG_LIBDIR.
-PKG_CONFIG_BIN="$(command -v pkg-config)"
-if [ -z "$PKG_CONFIG_BIN" ] || [ ! -x "$PKG_CONFIG_BIN" ]; then
-  echo "ERROR: pkg-config executable was not found on the runner." >&2
-  exit 1
-fi
-sed -i 's|^WRAP_PC=.*|WRAP_PC="/usr/bin/pkg-config"|' 2_build_qemu_android.sh
-sed -i 's|^cat > "$WRAP_PC" <<'"'"'EOF'"'"'$|if false; then cat > "$WRAP_PC" <<'"'"'EOF'"'"'|' 2_build_qemu_android.sh
-sed -i '/^chmod +x "$WRAP_PC"$/s/^/# /' 2_build_qemu_android.sh
-sed -i 's|^export PKG_CONFIG="$WRAP_PC"$|export PKG_CONFIG="'"$PKG_CONFIG_BIN"'"|' 2_build_qemu_android.sh
+# The upstream helper's generated wrapper was failing with ENOENT on the
+# GitHub Actions runner. Keep the wrapper, but place it in /tmp so it is
+# independent of the cloned build tree and uses an absolute Bash interpreter.
+# The helper still restricts package discovery through PKG_CONFIG_LIBDIR.
+PATCHED_WRAPPER="/tmp/webapp-android-pkg-config"
+sed -i 's|^WRAP_PC=.*|WRAP_PC="/tmp/webapp-android-pkg-config"|' 2_build_qemu_android.sh
+sed -i 's|^#!/usr/bin/env bash$|#!/bin/bash|' 2_build_qemu_android.sh
 
 NDK_PATH="$NDK" API_LEVEL=31 APP_ABI=arm64-v8a JOBS="$(nproc)" ./2_build_qemu_android.sh
 
