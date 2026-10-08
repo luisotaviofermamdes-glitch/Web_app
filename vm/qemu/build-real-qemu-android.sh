@@ -26,6 +26,22 @@ ln -s "$NDK" "$HOME/android-ndk-r29"
 
 cd "$BUILDER"
 chmod +x 2_build_qemu_android.sh
+
+# The upstream helper creates an android-pkg-config shell wrapper inside its
+# build directory. GitHub Actions can fail to execute that generated wrapper
+# with ENOENT even though the file was created. Use the runner's real
+# pkg-config executable instead; the helper still limits the search path to
+# the Android sysroot via PKG_CONFIG_LIBDIR.
+PKG_CONFIG_BIN="$(command -v pkg-config)"
+if [ -z "$PKG_CONFIG_BIN" ] || [ ! -x "$PKG_CONFIG_BIN" ]; then
+  echo "ERROR: pkg-config executable was not found on the runner." >&2
+  exit 1
+fi
+sed -i 's|^WRAP_PC=.*|WRAP_PC="/usr/bin/pkg-config"|' 2_build_qemu_android.sh
+sed -i 's|^cat > "$WRAP_PC" <<'"'"'EOF'"'"'$|if false; then cat > "$WRAP_PC" <<'"'"'EOF'"'"'|' 2_build_qemu_android.sh
+sed -i '/^chmod +x "$WRAP_PC"$/s/^/# /' 2_build_qemu_android.sh
+sed -i 's|^export PKG_CONFIG="$WRAP_PC"$|export PKG_CONFIG="'"$PKG_CONFIG_BIN"'"|' 2_build_qemu_android.sh
+
 NDK_PATH="$NDK" API_LEVEL=31 APP_ABI=arm64-v8a JOBS="$(nproc)" ./2_build_qemu_android.sh
 
 # Locate the actual x86_64 guest emulator produced by the build.
@@ -46,7 +62,7 @@ chmod 755 "$ROOT/app/src/main/assets/vm/bin/qemu-system-x86_64"
 # Copy firmware/resources when the builder produced them.
 FIRMWARE_DST="$ROOT/app/src/main/assets/vm/firmware"
 mkdir -p "$FIRMWARE_DST"
-for f in $(find "$BUILDER" -type f \( -name '*.fd' -o -name '*.rom' \) 2>/dev/null); do
+find "$BUILDER" -type f \( -name '*.fd' -o -name '*.rom' \) -print0 2>/dev/null | while IFS= read -r -d '' f; do
   cp "$f" "$FIRMWARE_DST/" || true
 done
 
