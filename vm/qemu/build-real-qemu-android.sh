@@ -22,16 +22,23 @@ mkdir -p "$WORK"
 git clone --depth 1 https://github.com/wasdwasd0105/qemu-ndk-sh.git "$BUILDER"
 
 # The upstream helper expects this conventional Linux NDK location.
-ln -s "$NDK" "$HOME/android-ndk-r29"
+ln -sfn "$NDK" "$HOME/android-ndk-r29"
 
 cd "$BUILDER"
 chmod +x 2_build_qemu_android.sh
 
-# The upstream helper's generated wrapper was failing with ENOENT on the
-# GitHub Actions runner. Keep the wrapper, but place it in /tmp so it is
-# independent of the cloned build tree and uses an absolute Bash interpreter.
-# The helper still restricts package discovery through PKG_CONFIG_LIBDIR.
+# The upstream helper generates android-pkg-config inside BUILD_ROOT, but on
+# GitHub Actions that generated wrapper has intermittently failed with ENOENT.
+# Create the wrapper ourselves at a stable absolute path and make the helper
+# use it. The wrapper delegates to the runner's real pkg-config while the
+# helper's PKG_CONFIG_LIBDIR keeps dependency lookup inside the Android sysroot.
 PATCHED_WRAPPER="/tmp/webapp-android-pkg-config"
+cat > "$PATCHED_WRAPPER" <<'EOF'
+#!/bin/bash
+exec /usr/bin/pkg-config "$@"
+EOF
+chmod 755 "$PATCHED_WRAPPER"
+
 sed -i 's|^WRAP_PC=.*|WRAP_PC="/tmp/webapp-android-pkg-config"|' 2_build_qemu_android.sh
 sed -i 's|^#!/usr/bin/env bash$|#!/bin/bash|' 2_build_qemu_android.sh
 
