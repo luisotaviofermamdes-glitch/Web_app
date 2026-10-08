@@ -1,76 +1,1145 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0078d4"><meta name="description" content="web_app V2 — desktop Windows inspirado, gerenciador de ISO e ferramentas web">
-<title>web_app V2 — Windows Web</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0078d4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="web_app V3 — Desktop Windows 10 no navegador">
+<link rel="manifest" href="manifest.json">
+<title>web_app V3 — Windows Web</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:"Segoe UI",Arial,sans-serif;color:#111}button,input,textarea{font:inherit}button{cursor:pointer}
-#desktop{position:absolute;inset:0 0 52px;background:linear-gradient(135deg,#0879b9,#063d78 62%,#111827);overflow:hidden}.wall{position:absolute;inset:0;background:radial-gradient(circle at 72% 42%,#ffffff1f,transparent 24%),linear-gradient(135deg,transparent 48%,#ffffff14 50%,transparent 52%);pointer-events:none}
-.icons{position:absolute;top:12px;left:8px;display:flex;flex-direction:column;gap:6px}.icon{width:92px;text-align:center;color:#fff;font-size:12px;padding:7px 4px;border-radius:5px;text-shadow:0 1px 2px #000;user-select:none}.icon:hover{background:#ffffff22}.ico{display:block;font-size:31px;margin-bottom:2px}
-.window{position:absolute;width:760px;height:500px;min-width:320px;min-height:220px;background:#f5f5f5;border:1px solid #777;box-shadow:0 16px 48px #0008;display:none;overflow:hidden;animation:open .16s ease-out}.window.closing{animation:close .12s ease-in}@keyframes open{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:none}}@keyframes close{to{opacity:0;transform:scale(.98)}}
-.titlebar{height:36px;background:#f7f7f7;display:flex;align-items:center;justify-content:space-between;padding-left:12px;border-bottom:1px solid #ddd;cursor:move;user-select:none}.titlebar b{font-size:13px;font-weight:500}.controls{height:100%;display:flex}.controls button{width:46px;border:0;background:transparent}.controls button:hover{background:#ddd}.controls .close:hover{background:#e81123;color:#fff}.content{height:calc(100% - 36px);overflow:auto;background:#fff}.toolbar{padding:8px;border-bottom:1px solid #ddd;background:#fafafa;display:flex;gap:7px;align-items:center}.toolbar input{flex:1;padding:7px;border:1px solid #aaa}.toolbar button,.action{padding:7px 11px;border:1px solid #aaa;background:#eee;border-radius:2px}.toolbar button:hover,.action:hover{background:#e1e1e1}
-.explorer{display:grid;grid-template-columns:190px 1fr;height:calc(100% - 50px)}.side{background:#f4f4f4;border-right:1px solid #ddd;padding:10px}.side div{padding:9px;border-radius:3px}.side div:hover{background:#ddd}.files{padding:18px;display:grid;grid-template-columns:repeat(auto-fill,105px);gap:12px;align-content:start}.file{text-align:center;padding:9px;border-radius:5px}.file:hover{background:#e8f3fb}.file span{display:block;font-size:39px}.status{padding:5px 12px;border-top:1px solid #ddd;font-size:12px;color:#666}
-.notepad{width:100%;height:100%;border:0;resize:none;padding:14px;outline:0;font:14px Consolas,monospace}.browser{display:flex;flex-direction:column;height:100%}.browser iframe{border:0;flex:1;width:100%}
-.terminal{height:100%;background:#0b0b0b;color:#eee;padding:12px;font:14px Consolas,monospace;overflow:auto}.terminal input{background:transparent;color:#fff;border:0;outline:0;width:75%;font:inherit}.terminal .line{white-space:pre-wrap;margin-bottom:4px}
-.settings{padding:22px}.card{border:1px solid #ddd;padding:15px;margin:10px 0;background:#fafafa;border-radius:4px}.card h3{margin:0 0 6px}.badge{display:inline-block;padding:3px 7px;border-radius:10px;background:#dff2ff;color:#075985;font-size:11px}.iso-drop{border:2px dashed #aaa;border-radius:8px;padding:24px;text-align:center;margin:12px 0;background:#fafafa}.iso-list{display:grid;gap:8px}.iso{border:1px solid #ddd;padding:10px;border-radius:5px;display:flex;justify-content:space-between;align-items:center}.vm-screen{margin:12px;background:#111;color:#aaa;min-height:220px;display:grid;place-items:center;text-align:center;border-radius:5px;padding:20px}.progress{height:8px;background:#ddd;border-radius:10px;overflow:hidden}.progress i{display:block;height:100%;width:0;background:#0078d4}
-#taskbar{position:absolute;left:0;right:0;bottom:0;height:52px;background:#151515ee;display:flex;align-items:center;color:#fff;z-index:10000}.startbtn{height:52px;width:54px;border:0;background:transparent;color:#fff;font-size:26px}.startbtn:hover,.task:hover{background:#333}.search{height:34px;width:270px;margin-left:4px;padding:0 12px;border:0}.tasks{display:flex;height:100%;margin-left:7px}.task{min-width:50px;height:52px;border:0;background:transparent;color:#fff;font-size:21px}.tray{margin-left:auto;display:flex;align-items:center;gap:12px;padding:0 12px;font-size:13px}.clock{text-align:right;line-height:16px}
-#startmenu{position:absolute;bottom:52px;left:0;width:680px;max-width:100vw;height:590px;max-height:calc(100vh - 52px);background:#191919f7;color:#fff;display:none;z-index:11000;padding:20px;box-shadow:0 0 35px #000}.start-head{font-size:18px;margin-bottom:14px}.start-search{width:100%;padding:10px;margin-bottom:14px;border:0}.start-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.tile{height:88px;background:#1668a7;border:0;color:#fff;text-align:left;padding:12px}.tile:hover{filter:brightness(1.15)}.tile small{display:block;margin-top:8px;opacity:.8}
-#context{position:absolute;display:none;background:#fff;color:#111;border:1px solid #aaa;box-shadow:0 5px 20px #0008;z-index:20000;width:205px}.ctx{padding:9px 14px;font-size:13px}.ctx:hover{background:#e5f3ff}.toast{position:absolute;right:18px;bottom:67px;background:#222;color:#fff;padding:12px 16px;border-radius:4px;display:none;z-index:25000}.hidden{display:none!important}
-#login{position:fixed;inset:0;background:linear-gradient(135deg,#0078d4,#001e3c);z-index:30000;color:#fff;display:grid;place-items:center}.login-box{text-align:center;width:min(360px,90vw)}.avatar{font-size:72px}.login-box input{width:100%;padding:12px;border:0;margin:12px 0}.login-box button{padding:11px 28px;border:0;background:#fff;color:#075985;border-radius:3px}.login-error{height:20px;color:#ffd7d7;font-size:13px}
-@media(max-width:760px){.window{width:94vw;height:74vh}.search{width:150px}.start-grid{grid-template-columns:repeat(2,1fr)}.explorer{grid-template-columns:120px 1fr}.tray span:not(.clock){display:none}}
+:root {
+  --accent: #0078d4;
+  --accent-hover: #106ebe;
+  --taskbar: #1a1a1aee;
+  --start-bg: #191919f5;
+  --window-bg: #f3f3f3;
+  --titlebar: #ffffff;
+  --text: #111;
+  --desktop-bg: linear-gradient(135deg, #0879b9 0%, #063d78 55%, #0a1628 100%);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; width: 100%; height: 100%; overflow: hidden;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  color: var(--text); background: #000;
+  touch-action: manipulation;
+}
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; border: none; background: none; }
+
+/* ===== DESKTOP ===== */
+#desktop {
+  position: absolute; inset: 0 0 48px 0;
+  background: var(--desktop-bg);
+  overflow: hidden; transition: background 0.4s;
+}
+.wall {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 70% 30%, rgba(255,255,255,0.12), transparent 30%),
+    radial-gradient(circle at 20% 80%, rgba(0,120,212,0.15), transparent 40%);
+  pointer-events: none;
+}
+
+/* Desktop icons */
+.icons {
+  position: absolute; top: 12px; left: 8px;
+  display: flex; flex-direction: column; gap: 4px;
+  z-index: 5;
+}
+.icon {
+  width: 86px; text-align: center; color: #fff;
+  font-size: 11px; padding: 8px 4px; border-radius: 4px;
+  text-shadow: 0 1px 3px #000a; user-select: none;
+  transition: background 0.15s;
+}
+.icon:active, .icon.selected { background: rgba(255,255,255,0.18); }
+.ico { display: block; font-size: 32px; margin-bottom: 3px; line-height: 1; }
+
+/* ===== WINDOWS ===== */
+.window {
+  position: absolute; width: min(780px, 96vw); height: min(520px, 78vh);
+  min-width: 280px; min-height: 200px;
+  background: var(--window-bg); border: 1px solid #666;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.45);
+  display: none; overflow: hidden;
+  border-radius: 6px 6px 0 0;
+  animation: winOpen 0.18s ease-out;
+  z-index: 100;
+}
+.window.closing { animation: winClose 0.12s ease-in forwards; }
+@keyframes winOpen {
+  from { opacity: 0; transform: scale(0.95) translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes winClose {
+  to { opacity: 0; transform: scale(0.97); }
+}
+.window.maximized {
+  left: 0 !important; top: 0 !important;
+  width: 100% !important; height: 100% !important;
+  border-radius: 0; border: none;
+}
+
+.titlebar {
+  height: 36px; background: var(--titlebar);
+  display: flex; align-items: center; justify-content: space-between;
+  padding-left: 12px; border-bottom: 1px solid #ddd;
+  cursor: grab; user-select: none;
+}
+.titlebar:active { cursor: grabbing; }
+.titlebar b { font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+.controls { height: 100%; display: flex; }
+.controls button {
+  width: 46px; height: 100%; font-size: 14px; color: #333;
+  transition: background 0.1s;
+}
+.controls button:hover { background: #e5e5e5; }
+.controls .close:hover { background: #e81123; color: #fff; }
+
+.content { height: calc(100% - 36px); overflow: auto; background: #fff; }
+
+/* Toolbar */
+.toolbar {
+  padding: 7px 10px; border-bottom: 1px solid #e0e0e0;
+  background: #fafafa; display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
+}
+.toolbar input {
+  flex: 1; min-width: 100px; padding: 6px 10px;
+  border: 1px solid #ccc; border-radius: 3px; outline: none;
+}
+.toolbar input:focus { border-color: var(--accent); }
+.btn {
+  padding: 6px 12px; border: 1px solid #ccc; background: #f0f0f0;
+  border-radius: 3px; font-size: 13px; transition: background 0.1s;
+}
+.btn:hover { background: #e0e0e0; }
+.btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn.primary:hover { background: var(--accent-hover); }
+
+/* Explorer */
+.explorer { display: grid; grid-template-columns: 170px 1fr; height: calc(100% - 48px); }
+.side { background: #f5f5f5; border-right: 1px solid #e0e0e0; padding: 8px; overflow-y: auto; }
+.side-item {
+  padding: 8px 10px; border-radius: 4px; font-size: 13px;
+  cursor: pointer; display: flex; align-items: center; gap: 8px;
+}
+.side-item:hover, .side-item.active { background: #e5f1fb; }
+.files {
+  padding: 16px; display: grid;
+  grid-template-columns: repeat(auto-fill, 100px); gap: 10px; align-content: start;
+}
+.file {
+  text-align: center; padding: 10px 6px; border-radius: 4px;
+  font-size: 12px; cursor: pointer; transition: background 0.1s;
+}
+.file:hover { background: #e8f3fb; }
+.file span { display: block; font-size: 36px; margin-bottom: 4px; }
+.status-bar {
+  padding: 4px 12px; border-top: 1px solid #e0e0e0;
+  font-size: 12px; color: #666; background: #fafafa;
+}
+
+/* Notepad */
+.notepad {
+  width: 100%; height: 100%; border: 0; resize: none;
+  padding: 14px; outline: 0; font: 14px Consolas, "Courier New", monospace;
+}
+
+/* Browser */
+.browser { display: flex; flex-direction: column; height: 100%; }
+.browser iframe { border: 0; flex: 1; width: 100%; background: #fff; }
+
+/* Terminal */
+.terminal {
+  height: 100%; background: #0c0c0c; color: #cccccc;
+  padding: 12px; font: 13px Consolas, monospace; overflow: auto;
+}
+.terminal input {
+  background: transparent; color: #fff; border: 0; outline: 0;
+  width: 70%; font: inherit;
+}
+.terminal .line { white-space: pre-wrap; margin-bottom: 2px; }
+.terminal .prompt { color: #16c60c; }
+
+/* Calculator */
+.calc {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+  padding: 16px; max-width: 280px; margin: 0 auto;
+}
+.calc-display {
+  grid-column: 1 / -1; background: #1a1a1a; color: #fff;
+  font-size: 28px; padding: 16px; text-align: right;
+  border-radius: 6px; font-family: Consolas, monospace;
+  min-height: 56px; word-break: break-all;
+}
+.calc button {
+  padding: 16px; font-size: 18px; border-radius: 6px;
+  background: #f0f0f0; transition: background 0.1s;
+}
+.calc button:hover { background: #e0e0e0; }
+.calc button.op { background: #e8e8e8; }
+.calc button.eq { background: var(--accent); color: #fff; }
+.calc button.eq:hover { background: var(--accent-hover); }
+
+/* Paint */
+.paint-area { display: flex; flex-direction: column; height: 100%; }
+.paint-tools {
+  padding: 8px; background: #f5f5f5; border-bottom: 1px solid #ddd;
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+}
+.paint-tools input[type=color] { width: 36px; height: 32px; border: 1px solid #ccc; padding: 2px; }
+#paintCanvas {
+  flex: 1; background: #fff; cursor: crosshair;
+  touch-action: none;
+}
+
+/* Settings & cards */
+.settings { padding: 20px; }
+.card {
+  border: 1px solid #e0e0e0; padding: 16px; margin: 12px 0;
+  background: #fafafa; border-radius: 6px;
+}
+.card h3 { margin: 0 0 8px; font-size: 15px; }
+.badge {
+  display: inline-block; padding: 3px 8px; border-radius: 10px;
+  background: #dff2ff; color: #075985; font-size: 11px; font-weight: 500;
+}
+.iso-drop {
+  border: 2px dashed #bbb; border-radius: 8px; padding: 28px;
+  text-align: center; margin: 14px 0; background: #fafafa;
+  transition: border-color 0.2s, background 0.2s;
+}
+.iso-drop.dragover { border-color: var(--accent); background: #e8f4fc; }
+.vm-screen {
+  margin: 12px 0; background: #111; color: #999;
+  min-height: 180px; display: grid; place-items: center;
+  text-align: center; border-radius: 6px; padding: 24px;
+}
+
+/* ===== TASKBAR ===== */
+#taskbar {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 48px;
+  background: var(--taskbar); backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex; align-items: center; color: #fff; z-index: 10000;
+}
+.startbtn {
+  height: 48px; width: 50px; color: #fff; font-size: 22px;
+  transition: background 0.15s;
+}
+.startbtn:hover, .startbtn.active { background: rgba(255,255,255,0.12); }
+.search-box {
+  height: 32px; width: min(240px, 30vw); margin-left: 4px;
+  padding: 0 12px; border: none; border-radius: 2px;
+  background: #333; color: #fff; outline: none;
+}
+.search-box::placeholder { color: #aaa; }
+.search-box:focus { background: #444; }
+.tasks { display: flex; height: 100%; margin-left: 6px; gap: 2px; }
+.task {
+  min-width: 48px; height: 48px; color: #fff; font-size: 18px;
+  position: relative; transition: background 0.15s;
+}
+.task:hover { background: rgba(255,255,255,0.1); }
+.task.active::after {
+  content: ''; position: absolute; bottom: 0; left: 20%; right: 20%;
+  height: 3px; background: var(--accent); border-radius: 2px 2px 0 0;
+}
+.tray {
+  margin-left: auto; display: flex; align-items: center;
+  gap: 10px; padding: 0 12px; font-size: 13px;
+}
+.clock { text-align: right; line-height: 15px; font-size: 12px; }
+
+/* ===== START MENU ===== */
+#startmenu {
+  position: absolute; bottom: 48px; left: 0;
+  width: min(620px, 100vw); height: min(560px, calc(100vh - 48px));
+  background: var(--start-bg); color: #fff;
+  display: none; z-index: 11000; padding: 16px 20px;
+  box-shadow: 0 0 40px #000a; border-radius: 0 8px 0 0;
+  animation: startOpen 0.18s ease-out;
+}
+@keyframes startOpen {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+.start-head { font-size: 16px; margin-bottom: 12px; font-weight: 500; }
+.start-search {
+  width: 100%; padding: 10px 14px; margin-bottom: 14px;
+  border: none; border-radius: 4px; background: #2a2a2a; color: #fff;
+  outline: none;
+}
+.start-search:focus { background: #333; }
+.start-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px; overflow-y: auto; max-height: calc(100% - 100px);
+}
+.tile {
+  height: 90px; background: #1668a7; border: none; color: #fff;
+  text-align: left; padding: 12px; border-radius: 4px;
+  font-size: 13px; transition: filter 0.15s, transform 0.1s;
+}
+.tile:hover { filter: brightness(1.15); }
+.tile:active { transform: scale(0.97); }
+.tile small { display: block; margin-top: 6px; opacity: 0.75; font-size: 11px; }
+.tile.green { background: #107c10; }
+.tile.orange { background: #ca5010; }
+.tile.purple { background: #5c2d91; }
+.tile.teal { background: #008272; }
+.tile.red { background: #c42b1c; }
+
+/* Context menu */
+#context {
+  position: absolute; display: none; background: #fff; color: #111;
+  border: 1px solid #ccc; box-shadow: 0 6px 24px #0005;
+  z-index: 20000; width: 200px; border-radius: 4px; overflow: hidden;
+}
+.ctx { padding: 9px 14px; font-size: 13px; cursor: pointer; }
+.ctx:hover { background: #e5f3ff; }
+.ctx.sep { border-top: 1px solid #eee; margin-top: 2px; padding-top: 10px; }
+
+/* Toast */
+.toast {
+  position: absolute; right: 16px; bottom: 60px;
+  background: #222; color: #fff; padding: 12px 18px;
+  border-radius: 6px; display: none; z-index: 25000;
+  box-shadow: 0 4px 20px #0006; font-size: 13px;
+  animation: toastIn 0.25s ease;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Login */
+#login {
+  position: fixed; inset: 0;
+  background: linear-gradient(145deg, #0078d4 0%, #001a33 100%);
+  z-index: 30000; color: #fff; display: grid; place-items: center;
+}
+.login-box { text-align: center; width: min(340px, 90vw); }
+.avatar {
+  width: 90px; height: 90px; border-radius: 50%;
+  background: rgba(255,255,255,0.15); display: grid; place-items: center;
+  font-size: 42px; margin: 0 auto 12px;
+}
+.login-box h2 { margin: 0 0 4px; font-weight: 400; }
+.login-box input {
+  width: 100%; padding: 12px 14px; border: none; margin: 14px 0 8px;
+  border-radius: 4px; background: rgba(255,255,255,0.9); color: #111;
+  outline: none;
+}
+.login-box button {
+  padding: 11px 32px; border: none; background: #fff;
+  color: #075985; border-radius: 4px; font-weight: 500;
+  transition: background 0.15s;
+}
+.login-box button:hover { background: #f0f0f0; }
+.login-error { height: 20px; color: #ffb4b4; font-size: 13px; margin-top: 6px; }
+.login-skip {
+  display: block; margin-top: 16px; color: rgba(255,255,255,0.6);
+  font-size: 13px; text-decoration: underline; cursor: pointer;
+}
+
+/* Mobile adjustments */
+@media (max-width: 700px) {
+  .window { width: 96vw; height: 76vh; left: 2vw !important; top: 2vh !important; }
+  .search-box { width: 120px; }
+  .start-grid { grid-template-columns: repeat(2, 1fr); }
+  .explorer { grid-template-columns: 1fr; }
+  .side { display: none; }
+  .tray span:not(.clock) { display: none; }
+  .icons { gap: 2px; }
+  .icon { width: 76px; font-size: 10px; }
+  .ico { font-size: 28px; }
+}
+
+/* Dark theme overrides */
+body.dark {
+  --window-bg: #2b2b2b;
+  --titlebar: #323232;
+  --text: #eee;
+}
+body.dark .content { background: #1e1e1e; color: #eee; }
+body.dark .titlebar { border-bottom-color: #444; color: #eee; }
+body.dark .controls button { color: #ccc; }
+body.dark .controls button:hover { background: #444; }
+body.dark .toolbar { background: #2b2b2b; border-bottom-color: #444; }
+body.dark .toolbar input { background: #1e1e1e; border-color: #555; color: #eee; }
+body.dark .btn { background: #3a3a3a; border-color: #555; color: #eee; }
+body.dark .btn:hover { background: #4a4a4a; }
+body.dark .side { background: #252525; border-right-color: #444; }
+body.dark .side-item:hover, body.dark .side-item.active { background: #333; }
+body.dark .file:hover { background: #333; }
+body.dark .status-bar { background: #252525; border-top-color: #444; color: #aaa; }
+body.dark .card { background: #252525; border-color: #444; }
+body.dark .iso-drop { background: #252525; border-color: #555; }
+body.dark .notepad { background: #1e1e1e; color: #eee; }
+body.dark .calc button { background: #3a3a3a; color: #eee; }
+body.dark .calc button.op { background: #333; }
+body.dark .paint-tools { background: #2b2b2b; border-bottom-color: #444; }
 </style>
 </head>
 <body>
-<div id="login"><div class="login-box"><div class="avatar">👤</div><h2>Admin</h2><div>web_app V2</div><input id="senha" type="password" placeholder="Senha"><button onclick="entrar()">Entrar</button><div id="loginError" class="login-error"></div><small>Desktop web inspirado no Windows 10</small></div></div>
-<div id="desktop"><div class="wall"></div>
-<div class="icons">
-<div class="icon" ondblclick="openWin('explorer')"><span class="ico">🖥️</span>Este Computador</div>
-<div class="icon" ondblclick="openWin('browser')"><span class="ico">🌐</span>Navegador</div>
-<div class="icon" ondblclick="openWin('notepad')"><span class="ico">📝</span>Bloco de Notas</div>
-<div class="icon" ondblclick="openWin('terminal')"><span class="ico">⌨️</span>Terminal</div>
-<div class="icon" ondblclick="openWin('iso')"><span class="ico">💿</span>Windows ISO</div>
-<div class="icon" ondblclick="openWin('settings')"><span class="ico">⚙️</span>Configurações</div>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <div class="avatar">👤</div>
+    <h2>Us</h2>
+    <div style="opacity:0.8;font-size:14px">web_app V3</div>
+    <input id="senha" type="password" placeholder="Senha (opcional)" autocomplete="off">
+    <button onclick="entrar()">Entrar</button>
+    <div id="loginError" class="login-error"></div>
+    <span class="login-skip" onclick="entrar(true)">Pular login →</span>
+    <div style="margin-top:20px;font-size:12px;opacity:0.5">Desktop web inspirado no Windows 10</div>
+  </div>
 </div>
 
-<div class="window" id="explorer" style="left:90px;top:55px"><div class="titlebar"><b>📁 Este Computador</b><div class="controls"><button onclick="minWin('explorer')">—</button><button onclick="maxWin('explorer')">□</button><button class="close" onclick="closeWin('explorer')">×</button></div></div><div class="content"><div class="toolbar"><button>←</button><button>→</button><input value="Este Computador" readonly></div><div class="explorer"><div class="side"><div>🏠 Início</div><div>📄 Documentos</div><div>⬇️ Downloads</div><div>🖼️ Imagens</div><div>💿 Windows ISO</div><div>🗑️ Lixeira</div></div><div class="files"><div class="file"><span>📁</span>Documentos</div><div class="file"><span>📁</span>Downloads</div><div class="file"><span>🖼️</span>Imagens</div><div class="file"><span>💿</span>ISO do Windows</div><div class="file"><span>🗑️</span>Lixeira</div></div></div><div class="status">Este Computador • armazenamento local do navegador</div></div></div>
+<!-- DESKTOP -->
+<div id="desktop">
+  <div class="wall"></div>
+  <div class="icons" id="desktopIcons">
+    <div class="icon" ondblclick="openWin('explorer')" ontouchend="handleIconTap(event,'explorer')">
+      <span class="ico">🖥️</span>Este Computador
+    </div>
+    <div class="icon" ondblclick="openWin('browser')" ontouchend="handleIconTap(event,'browser')">
+      <span class="ico">🌐</span>Navegador
+    </div>
+    <div class="icon" ondblclick="openWin('notepad')" ontouchend="handleIconTap(event,'notepad')">
+      <span class="ico">📝</span>Bloco de Notas
+    </div>
+    <div class="icon" ondblclick="openWin('calc')" ontouchend="handleIconTap(event,'calc')">
+      <span class="ico">🔢</span>Calculadora
+    </div>
+    <div class="icon" ondblclick="openWin('paint')" ontouchend="handleIconTap(event,'paint')">
+      <span class="ico">🎨</span>Paint
+    </div>
+    <div class="icon" ondblclick="openWin('terminal')" ontouchend="handleIconTap(event,'terminal')">
+      <span class="ico">⌨️</span>Terminal
+    </div>
+    <div class="icon" ondblclick="openWin('iso')" ontouchend="handleIconTap(event,'iso')">
+      <span class="ico">💿</span>Windows ISO
+    </div>
+    <div class="icon" ondblclick="openWin('settings')" ontouchend="handleIconTap(event,'settings')">
+      <span class="ico">⚙️</span>Configurações
+    </div>
+  </div>
 
-<div class="window" id="notepad" style="left:180px;top:90px"><div class="titlebar"><b>📝 Bloco de Notas</b><div class="controls"><button onclick="minWin('notepad')">—</button><button onclick="maxWin('notepad')">□</button><button class="close" onclick="closeWin('notepad')">×</button></div></div><div class="content"><textarea class="notepad" id="notes" placeholder="Digite aqui..."></textarea></div></div>
+  <!-- EXPLORER -->
+  <div class="window" id="explorer" style="left:60px;top:40px">
+    <div class="titlebar" data-win="explorer">
+      <b>📁 Este Computador</b>
+      <div class="controls">
+        <button onclick="minWin('explorer')">—</button>
+        <button onclick="maxWin('explorer')">□</button>
+        <button class="close" onclick="closeWin('explorer')">×</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="toolbar">
+        <button class="btn" onclick="navExplorer('home')">←</button>
+        <input id="explorerPath" value="Este Computador" readonly>
+      </div>
+      <div class="explorer">
+        <div class="side">
+          <div class="side-item active" onclick="navExplorer('home')">🏠 Início</div>
+          <div class="side-item" onclick="navExplorer('docs')">📄 Documentos</div>
+          <div class="side-item" onclick="navExplorer('downloads')">⬇️ Downloads</div>
+          <div class="side-item" onclick="navExplorer('images')">🖼️ Imagens</div>
+          <div class="side-item" onclick="navExplorer('iso')">💿 Windows ISO</div>
+          <div class="side-item" onclick="navExplorer('trash')">🗑️ Lixeira</div>
+        </div>
+        <div class="files" id="explorerFiles"></div>
+      </div>
+      <div class="status-bar" id="explorerStatus">Este Computador • armazenamento local</div>
+    </div>
+  </div>
 
-<div class="window" id="browser" style="left:230px;top:70px"><div class="titlebar"><b>🌐 Navegador Web</b><div class="controls"><button onclick="minWin('browser')">—</button><button onclick="maxWin('browser')">□</button><button class="close" onclick="closeWin('browser')">×</button></div></div><div class="content browser"><div class="toolbar"><input id="url" value="https://www.microsoft.com"><button onclick="navigate()">Ir</button><button onclick="openExternal()">Abrir fora</button></div><iframe id="frame" src="https://www.microsoft.com"></iframe></div></div>
+  <!-- NOTEPAD -->
+  <div class="window" id="notepad" style="left:120px;top:70px">
+    <div class="titlebar" data-win="notepad">
+      <b>📝 Bloco de Notas</b>
+      <div class="controls">
+        <button onclick="minWin('notepad')">—</button>
+        <button onclick="maxWin('notepad')">□</button>
+        <button class="close" onclick="closeWin('notepad')">×</button>
+      </div>
+    </div>
+    <div class="content" style="padding:0">
+      <textarea class="notepad" id="notes" placeholder="Digite aqui..."></textarea>
+    </div>
+  </div>
 
-<div class="window" id="terminal" style="left:270px;top:110px;background:#111;color:#eee"><div class="titlebar" style="background:#202020;color:#fff"><b>⌨️ Terminal</b><div class="controls"><button style="color:#fff" onclick="minWin('terminal')">—</button><button style="color:#fff" onclick="maxWin('terminal')">□</button><button class="close" style="color:#fff" onclick="closeWin('terminal')">×</button></div></div><div class="terminal" id="termout"><div class="line">web_app Terminal V2</div><div class="line">Digite <b>help</b> para comandos.</div><br><span>web_app&gt; </span><input id="term" onkeydown="terminalKey(event)"></div></div>
+  <!-- BROWSER -->
+  <div class="window" id="browser" style="left:160px;top:50px">
+    <div class="titlebar" data-win="browser">
+      <b>🌐 Navegador Web</b>
+      <div class="controls">
+        <button onclick="minWin('browser')">—</button>
+        <button onclick="maxWin('browser')">□</button>
+        <button class="close" onclick="closeWin('browser')">×</button>
+      </div>
+    </div>
+    <div class="content browser">
+      <div class="toolbar">
+        <input id="url" value="https://www.microsoft.com" onkeydown="if(event.key==='Enter')navigate()">
+        <button class="btn" onclick="navigate()">Ir</button>
+        <button class="btn" onclick="openExternal()">↗</button>
+      </div>
+      <iframe id="frame" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    </div>
+  </div>
 
-<div class="window" id="iso" style="left:210px;top:65px"><div class="titlebar"><b>💿 Windows ISO / Máquina Virtual</b><div class="controls"><button onclick="minWin('iso')">—</button><button onclick="maxWin('iso')">□</button><button class="close" onclick="closeWin('iso')">×</button></div></div><div class="content" style="padding:18px"><h2>Windows ISO</h2><p>Baixe a ISO oficial ou selecione uma ISO que já esteja no seu celular/PC.</p><div class="card"><b>Downloads oficiais</b><p>Windows 11 e Windows 10 são fornecidos pela Microsoft.</p><button class="action" onclick="location.href='https://www.microsoft.com/software-download/windows11'">Windows 11 ISO</button> <button class="action" onclick="location.href='https://www.microsoft.com/software-download/windows10ISO'">Windows 10 ISO</button></div><div class="iso-drop"><b>Adicionar ISO local</b><p><input id="isoFile" type="file" accept=".iso,application/octet-stream"></p><small>O arquivo fica no seu dispositivo; o navegador não envia a ISO para o GitHub.</small></div><div id="isoInfo" class="card">Nenhuma ISO selecionada.</div><div class="vm-screen"><div><h3>Máquina virtual</h3><p>O navegador não consegue executar Windows 10/11 nativamente só com HTML. Para iniciar uma ISO real é necessário um emulador/VM WebAssembly ou um servidor com QEMU/KVM.</p><span class="badge">Gerenciador de ISO ativo</span></div></div></div></div>
+  <!-- CALCULATOR -->
+  <div class="window" id="calc" style="left:200px;top:80px;width:300px;height:420px">
+    <div class="titlebar" data-win="calc">
+      <b>🔢 Calculadora</b>
+      <div class="controls">
+        <button onclick="minWin('calc')">—</button>
+        <button onclick="maxWin('calc')">□</button>
+        <button class="close" onclick="closeWin('calc')">×</button>
+      </div>
+    </div>
+    <div class="content" style="padding:0;display:flex;align-items:center;justify-content:center">
+      <div class="calc">
+        <div class="calc-display" id="calcDisplay">0</div>
+        <button onclick="calcClear()">C</button>
+        <button onclick="calcInput('(')">(</button>
+        <button onclick="calcInput(')')">)</button>
+        <button class="op" onclick="calcInput('/')">÷</button>
+        <button onclick="calcInput('7')">7</button>
+        <button onclick="calcInput('8')">8</button>
+        <button onclick="calcInput('9')">9</button>
+        <button class="op" onclick="calcInput('*')">×</button>
+        <button onclick="calcInput('4')">4</button>
+        <button onclick="calcInput('5')">5</button>
+        <button onclick="calcInput('6')">6</button>
+        <button class="op" onclick="calcInput('-')">−</button>
+        <button onclick="calcInput('1')">1</button>
+        <button onclick="calcInput('2')">2</button>
+        <button onclick="calcInput('3')">3</button>
+        <button class="op" onclick="calcInput('+')">+</button>
+        <button onclick="calcInput('0')" style="grid-column:span 2">0</button>
+        <button onclick="calcInput('.')">.</button>
+        <button class="eq" onclick="calcEval()">=</button>
+      </div>
+    </div>
+  </div>
 
-<div class="window" id="settings" style="left:320px;top:80px"><div class="titlebar"><b>⚙️ Configurações</b><div class="controls"><button onclick="minWin('settings')">—</button><button onclick="maxWin('settings')">□</button><button class="close" onclick="closeWin('settings')">×</button></div></div><div class="content settings"><h2>Configurações</h2><div class="card"><h3>Aparência</h3><p>Alternar tema e efeitos.</p><button class="action" onclick="toggleTheme()">Alternar tema</button></div><div class="card"><h3>Dados</h3><p>Notas, preferências e lista de ISO ficam salvas localmente.</p><button class="action" onclick="clearData()">Limpar dados</button></div><div class="card"><h3>Aplicativo</h3><p>web_app V2 • desktop web inspirado no Windows 10.</p><span class="badge">V2</span></div></div></div>
+  <!-- PAINT -->
+  <div class="window" id="paint" style="left:100px;top:40px;width:640px;height:480px">
+    <div class="titlebar" data-win="paint">
+      <b>🎨 Paint</b>
+      <div class="controls">
+        <button onclick="minWin('paint')">—</button>
+        <button onclick="maxWin('paint')">□</button>
+        <button class="close" onclick="closeWin('paint')">×</button>
+      </div>
+    </div>
+    <div class="content" style="padding:0">
+      <div class="paint-area">
+        <div class="paint-tools">
+          <label>Cor: <input type="color" id="paintColor" value="#000000"></label>
+          <label>Tamanho: <input type="range" id="paintSize" min="1" max="30" value="3"></label>
+          <button class="btn" onclick="paintClear()">Limpar</button>
+        </div>
+        <canvas id="paintCanvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERMINAL -->
+  <div class="window" id="terminal" style="left:220px;top:90px;background:#0c0c0c">
+    <div class="titlebar" data-win="terminal" style="background:#202020;color:#fff;border-bottom-color:#333">
+      <b>⌨️ Terminal</b>
+      <div class="controls">
+        <button style="color:#ccc" onclick="minWin('terminal')">—</button>
+        <button style="color:#ccc" onclick="maxWin('terminal')">□</button>
+        <button class="close" style="color:#ccc" onclick="closeWin('terminal')">×</button>
+      </div>
+    </div>
+    <div class="terminal" id="termout">
+      <div class="line">web_app Terminal V3</div>
+      <div class="line">Digite <b>help</b> para ver os comandos.</div>
+      <br>
+      <span class="prompt">web_app&gt; </span><input id="term" onkeydown="terminalKey(event)" autocomplete="off">
+    </div>
+  </div>
+
+  <!-- ISO MANAGER -->
+  <div class="window" id="iso" style="left:140px;top:45px">
+    <div class="titlebar" data-win="iso">
+      <b>💿 Windows ISO / Máquina Virtual</b>
+      <div class="controls">
+        <button onclick="minWin('iso')">—</button>
+        <button onclick="maxWin('iso')">□</button>
+        <button class="close" onclick="closeWin('iso')">×</button>
+      </div>
+    </div>
+    <div class="content" style="padding:18px">
+      <h2 style="margin-top:0">Windows ISO</h2>
+      <p>Baixe a ISO oficial da Microsoft ou selecione uma ISO que já esteja no seu dispositivo.</p>
+
+      <div class="card">
+        <b>Downloads oficiais</b>
+        <p style="margin:8px 0;font-size:13px;color:#555">Windows 10 e Windows 11 são fornecidos gratuitamente pela Microsoft (licença necessária para ativação).</p>
+        <button class="btn primary" onclick="window.open('https://www.microsoft.com/software-download/windows11','_blank')">Windows 11 ISO</button>
+        <button class="btn" onclick="window.open('https://www.microsoft.com/software-download/windows10ISO','_blank')">Windows 10 ISO</button>
+      </div>
+
+      <div class="iso-drop" id="isoDrop">
+        <b>📁 Adicionar ISO local</b>
+        <p style="margin:8px 0"><input id="isoFile" type="file" accept=".iso,application/octet-stream"></p>
+        <small style="color:#777">O arquivo fica apenas no seu dispositivo. Nada é enviado para servidores.</small>
+      </div>
+
+      <div id="isoInfo" class="card">Nenhuma ISO selecionada.</div>
+
+      <div class="vm-screen">
+        <div>
+          <h3 style="margin:0 0 8px;color:#ccc">Máquina Virtual</h3>
+          <p style="font-size:13px;max-width:340px;margin:0 auto 12px">
+            O navegador não consegue executar Windows nativamente só com HTML.<br>
+            Para VM real use a versão Android com QEMU, ou conecte-se a um PC remoto.
+          </p>
+          <span class="badge">Gerenciador de ISO ativo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="window" id="settings" style="left:260px;top:60px">
+    <div class="titlebar" data-win="settings">
+      <b>⚙️ Configurações</b>
+      <div class="controls">
+        <button onclick="minWin('settings')">—</button>
+        <button onclick="maxWin('settings')">□</button>
+        <button class="close" onclick="closeWin('settings')">×</button>
+      </div>
+    </div>
+    <div class="content settings">
+      <h2 style="margin-top:0">Configurações</h2>
+
+      <div class="card">
+        <h3>Aparência</h3>
+        <p style="font-size:13px;color:#666;margin:6px 0 12px">Tema claro / escuro e papel de parede.</p>
+        <button class="btn" onclick="toggleTheme()">Alternar tema claro/escuro</button>
+        <button class="btn" onclick="changeWallpaper()" style="margin-left:6px">Trocar papel de parede</button>
+      </div>
+
+      <div class="card">
+        <h3>Dados locais</h3>
+        <p style="font-size:13px;color:#666;margin:6px 0 12px">Notas, preferências e lista de ISO ficam salvas neste navegador.</p>
+        <button class="btn" onclick="clearData()">Limpar todos os dados</button>
+      </div>
+
+      <div class="card">
+        <h3>Sobre o web_app</h3>
+        <p style="font-size:13px;margin:6px 0">web_app V3 • Desktop web inspirado no Windows 10</p>
+        <span class="badge">V3</span>
+        <span class="badge" style="margin-left:6px">PWA</span>
+        <p style="font-size:12px;color:#888;margin-top:12px">
+          Funciona offline após a primeira visita (quando instalado como PWA).<br>
+          Ideal para iOS Safari e Android Chrome.
+        </p>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div id="startmenu"><div class="start-head">☰ &nbsp; Iniciar</div><input class="start-search" id="startSearch" placeholder="Pesquisar aplicativos" oninput="filterTiles()"><div class="start-grid" id="startGrid">
-<button class="tile" data-name="explorador arquivos" onclick="openWin('explorer')">📁<br>Explorador<small>Arquivos</small></button><button class="tile" data-name="navegador web" onclick="openWin('browser')">🌐<br>Navegador<small>Web</small></button><button class="tile" data-name="notas bloco" onclick="openWin('notepad')">📝<br>Notas<small>Bloco de notas</small></button><button class="tile" data-name="terminal comandos" onclick="openWin('terminal')">⌨️<br>Terminal<small>Comandos</small></button><button class="tile" data-name="windows iso maquina virtual" onclick="openWin('iso')">💿<br>Windows ISO<small>VM / ISO</small></button><button class="tile" data-name="configuracoes sistema" onclick="openWin('settings')">⚙️<br>Configurações<small>Sistema</small></button></div></div>
-<div id="context"><div class="ctx" onclick="openWin('explorer');hideContext()">Abrir Este Computador</div><div class="ctx" onclick="openWin('iso');hideContext()">Windows ISO</div><div class="ctx" onclick="openWin('notepad');hideContext()">Novo documento</div><div class="ctx" onclick="location.reload()">Atualizar</div></div><div class="toast" id="toast"></div>
-<div id="taskbar"><button class="startbtn" onclick="toggleStart()">⊞</button><input class="search" placeholder="Pesquisar" onkeydown="searchKey(event)"><div class="tasks"><button class="task" onclick="openWin('explorer')">📁</button><button class="task" onclick="openWin('browser')">🌐</button><button class="task" onclick="openWin('notepad')">📝</button><button class="task" onclick="openWin('terminal')">⌨️</button><button class="task" onclick="openWin('iso')">💿</button></div><div class="tray"><span>🔊</span><span>📶</span><div class="clock"><span id="time"></span><br><span id="date"></span></div></div></div>
+<!-- START MENU -->
+<div id="startmenu">
+  <div class="start-head">☰ &nbsp; Iniciar</div>
+  <input class="start-search" id="startSearch" placeholder="Pesquisar aplicativos, configurações..." oninput="filterTiles()">
+  <div class="start-grid" id="startGrid">
+    <button class="tile" data-name="explorador arquivos este computador" onclick="openWin('explorer')">📁<br>Explorador<small>Arquivos</small></button>
+    <button class="tile" data-name="navegador web internet" onclick="openWin('browser')">🌐<br>Navegador<small>Web</small></button>
+    <button class="tile green" data-name="notas bloco de notas texto" onclick="openWin('notepad')">📝<br>Notas<small>Bloco de notas</small></button>
+    <button class="tile orange" data-name="calculadora calcular números" onclick="openWin('calc')">🔢<br>Calculadora<small>Cálculos</small></button>
+    <button class="tile purple" data-name="paint desenhar arte" onclick="openWin('paint')">🎨<br>Paint<small>Desenho</small></button>
+    <button class="tile teal" data-name="terminal comandos console" onclick="openWin('terminal')">⌨️<br>Terminal<small>Comandos</small></button>
+    <button class="tile red" data-name="windows iso maquina virtual vm" onclick="openWin('iso')">💿<br>Windows ISO<small>VM / ISO</small></button>
+    <button class="tile" data-name="configurações sistema ajustes" onclick="openWin('settings')">⚙️<br>Configurações<small>Sistema</small></button>
+  </div>
+</div>
+
+<!-- CONTEXT MENU -->
+<div id="context">
+  <div class="ctx" onclick="openWin('explorer');hideContext()">Abrir Este Computador</div>
+  <div class="ctx" onclick="openWin('iso');hideContext()">Windows ISO</div>
+  <div class="ctx" onclick="openWin('notepad');hideContext()">Novo documento</div>
+  <div class="ctx" onclick="openWin('paint');hideContext()">Abrir Paint</div>
+  <div class="ctx sep" onclick="location.reload()">Atualizar desktop</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- TASKBAR -->
+<div id="taskbar">
+  <button class="startbtn" id="startBtn" onclick="toggleStart()">⊞</button>
+  <input class="search-box" placeholder="Pesquisar" onkeydown="searchKey(event)">
+  <div class="tasks" id="taskList">
+    <button class="task" data-win="explorer" onclick="openWin('explorer')">📁</button>
+    <button class="task" data-win="browser" onclick="openWin('browser')">🌐</button>
+    <button class="task" data-win="notepad" onclick="openWin('notepad')">📝</button>
+    <button class="task" data-win="calc" onclick="openWin('calc')">🔢</button>
+    <button class="task" data-win="paint" onclick="openWin('paint')">🎨</button>
+    <button class="task" data-win="terminal" onclick="openWin('terminal')">⌨️</button>
+    <button class="task" data-win="iso" onclick="openWin('iso')">💿</button>
+  </div>
+  <div class="tray">
+    <span>🔊</span>
+    <span>📶</span>
+    <div class="clock">
+      <span id="time"></span><br>
+      <span id="date"></span>
+    </div>
+  </div>
+</div>
+
 <script>
-const $=id=>document.getElementById(id);let z=100,maximized={};const wins=[...document.querySelectorAll('.window')];
-function entrar(){if($('senha').value===''){ $('loginError').textContent='Digite uma senha.';return } $('login').style.display='none';sessionStorage.setItem('web_app_login','1');toast('Bem-vindo ao web_app V2');$('senha').value=''}
-$('senha').addEventListener('keydown',e=>{if(e.key==='Enter')entrar()});if(sessionStorage.getItem('web_app_login')==='1')$('login').style.display='none';
-function openWin(id){const w=$(id);w.classList.remove('closing');w.style.display='block';w.style.zIndex=++z;hideStart()}
-function closeWin(id){const w=$(id);w.classList.add('closing');setTimeout(()=>{w.style.display='none';w.classList.remove('closing')},110)}function minWin(id){$(id).style.display='none'}
-function maxWin(id){const w=$(id);if(!maximized[id]){w.dataset.old=JSON.stringify({left:w.style.left,top:w.style.top,width:w.style.width,height:w.style.height});Object.assign(w.style,{left:'0',top:'0',width:'100%',height:'100%'});maximized[id]=true}else{Object.assign(w.style,JSON.parse(w.dataset.old));maximized[id]=false}}
-wins.forEach(w=>{w.addEventListener('mousedown',()=>w.style.zIndex=++z);const bar=w.querySelector('.titlebar');let drag=false,sx=0,sy=0,ox=0,oy=0;bar.addEventListener('pointerdown',e=>{if(maximized[w.id])return;drag=true;sx=e.clientX;sy=e.clientY;ox=w.offsetLeft;oy=w.offsetTop;bar.setPointerCapture(e.pointerId)});bar.addEventListener('pointermove',e=>{if(drag){w.style.left=Math.max(0,ox+e.clientX-sx)+'px';w.style.top=Math.max(0,oy+e.clientY-sy)+'px'}});bar.addEventListener('pointerup',()=>drag=false);});
-function toggleStart(){const s=$('startmenu');s.style.display=s.style.display==='block'?'none':'block'}function hideStart(){$('startmenu').style.display='none'}function hideContext(){$('context').style.display='none'}
-document.addEventListener('contextmenu',e=>{e.preventDefault();const c=$('context');c.style.left=Math.min(e.clientX,innerWidth-210)+'px';c.style.top=Math.min(e.clientY,innerHeight-120)+'px';c.style.display='block'});document.addEventListener('click',e=>{if(!e.target.closest('#context'))hideContext()});
-function updateClock(){const d=new Date();$('time').textContent=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});$('date').textContent=d.toLocaleDateString()}setInterval(updateClock,1000);updateClock();
-const notes=$('notes');notes.value=localStorage.getItem('web_app_notes')||'';notes.addEventListener('input',()=>localStorage.setItem('web_app_notes',notes.value));
-function navigate(){let u=$('url').value.trim();if(!/^https?:\/\//i.test(u))u='https://'+u;$('frame').src=u}function openExternal(){let u=$('url').value.trim();if(!/^https?:\/\//i.test(u))u='https://'+u;window.open(u,'_blank','noopener,noreferrer')}
-function terminalKey(e){if(e.key!=='Enter')return;const v=e.target.value.trim(),o=$('termout');const add=t=>{const d=document.createElement('div');d.className='line';d.textContent=t;o.appendChild(d)};if(v==='help')add('help, clear, date, time, about, iso, open explorer, open notes');else if(v==='clear')o.innerHTML='';else if(v==='date')add(new Date().toLocaleDateString());else if(v==='time')add(new Date().toLocaleTimeString());else if(v==='about')add('web_app V2 desktop web');else if(v==='iso'){openWin('iso');add('Abrindo Windows ISO...')}else if(v==='open explorer'){openWin('explorer');add('Explorador aberto.')}else if(v==='open notes'){openWin('notepad');add('Bloco de Notas aberto.')}else if(v)add('Comando não encontrado: '+v);e.target.value=''}
-function searchKey(e){if(e.key!=='Enter')return;const q=e.target.value.toLowerCase();if(q.includes('iso')||q.includes('windows'))openWin('iso');else if(q.includes('nota'))openWin('notepad');else if(q.includes('terminal'))openWin('terminal');else if(q.includes('config'))openWin('settings');else if(q.includes('arquivo'))openWin('explorer');else if(q.includes('web')||q.includes('naveg'))openWin('browser');else toast('Nenhum aplicativo encontrado')}
-function filterTiles(){const q=$('startSearch').value.toLowerCase();document.querySelectorAll('#startGrid .tile').forEach(x=>x.style.display=x.dataset.name.includes(q)?'block':'none')}
-function toggleTheme(){const d=$('desktop');d.style.background=d.style.background.includes('b9e5')?'linear-gradient(135deg,#0879b9,#063d78 62%,#111827)':'linear-gradient(135deg,#b9e5ff,#6aa7d8)';localStorage.setItem('web_app_theme',d.style.background);toast('Tema alterado')}
-function clearData(){localStorage.removeItem('web_app_notes');localStorage.removeItem('web_app_iso');notes.value='';$('isoInfo').textContent='Nenhuma ISO selecionada.';toast('Dados locais limpos')}
-function toast(t){$('toast').textContent=t;$('toast').style.display='block';clearTimeout(window.tt);window.tt=setTimeout(()=>$('toast').style.display='none',2200)}
-if(localStorage.getItem('web_app_theme'))$('desktop').style.background=localStorage.getItem('web_app_theme');
-$('isoFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const mb=(f.size/1024/1024).toFixed(1);$('isoInfo').innerHTML='<b>'+f.name+'</b><br>Tamanho: '+mb+' MB<br><span class="badge">ISO selecionada localmente</span>';localStorage.setItem('web_app_iso',JSON.stringify({name:f.name,size:f.size}));toast('ISO adicionada ao gerenciador')});
-const savedIso=localStorage.getItem('web_app_iso');if(savedIso){try{const x=JSON.parse(savedIso);$('isoInfo').innerHTML='<b>'+x.name+'</b><br>Tamanho: '+(x.size/1024/1024).toFixed(1)+' MB<br><span class="badge">ISO registrada neste navegador</span>'}catch{}}
+/* ===== CORE ===== */
+const $ = id => document.getElementById(id);
+let zIndex = 100;
+const maximized = {};
+let lastTap = 0;
+
+/* Login */
+function entrar(skip) {
+  if (!skip && $('senha').value === '' && !sessionStorage.getItem('web_app_login')) {
+    // allow empty password
+  }
+  $('login').style.display = 'none';
+  sessionStorage.setItem('web_app_login', '1');
+  toast('Bem-vindo ao web_app V3');
+  $('senha').value = '';
+}
+$('senha').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
+if (sessionStorage.getItem('web_app_login') === '1') $('login').style.display = 'none';
+
+/* Window management */
+function openWin(id) {
+  const w = $(id);
+  if (!w) return;
+  w.classList.remove('closing');
+  w.style.display = 'block';
+  w.style.zIndex = ++zIndex;
+  hideStart();
+  updateTaskbar();
+  if (id === 'paint') initPaint();
+  if (id === 'browser' && $('frame').src === 'about:blank') navigate();
+}
+
+function closeWin(id) {
+  const w = $(id);
+  w.classList.add('closing');
+  setTimeout(() => {
+    w.style.display = 'none';
+    w.classList.remove('closing');
+    updateTaskbar();
+  }, 120);
+}
+
+function minWin(id) {
+  $(id).style.display = 'none';
+  updateTaskbar();
+}
+
+function maxWin(id) {
+  const w = $(id);
+  if (!maximized[id]) {
+    w.dataset.old = JSON.stringify({
+      left: w.style.left, top: w.style.top,
+      width: w.style.width, height: w.style.height
+    });
+    w.classList.add('maximized');
+    maximized[id] = true;
+  } else {
+    const old = JSON.parse(w.dataset.old || '{}');
+    Object.assign(w.style, old);
+    w.classList.remove('maximized');
+    maximized[id] = false;
+  }
+}
+
+function updateTaskbar() {
+  document.querySelectorAll('.task').forEach(t => {
+    const id = t.dataset.win;
+    const w = $(id);
+    t.classList.toggle('active', w && w.style.display === 'block');
+  });
+}
+
+/* Drag windows */
+document.querySelectorAll('.window').forEach(w => {
+  w.addEventListener('pointerdown', () => { w.style.zIndex = ++zIndex; });
+  const bar = w.querySelector('.titlebar');
+  let drag = false, sx, sy, ox, oy;
+
+  bar.addEventListener('pointerdown', e => {
+    if (maximized[w.id] || e.target.closest('.controls')) return;
+    drag = true;
+    sx = e.clientX; sy = e.clientY;
+    ox = w.offsetLeft; oy = w.offsetTop;
+    bar.setPointerCapture(e.pointerId);
+  });
+  bar.addEventListener('pointermove', e => {
+    if (!drag) return;
+    w.style.left = Math.max(0, ox + e.clientX - sx) + 'px';
+    w.style.top = Math.max(0, oy + e.clientY - sy) + 'px';
+  });
+  bar.addEventListener('pointerup', () => { drag = false; });
+});
+
+/* Touch double-tap for icons */
+function handleIconTap(e, id) {
+  const now = Date.now();
+  if (now - lastTap < 300) {
+    e.preventDefault();
+    openWin(id);
+  }
+  lastTap = now;
+}
+
+/* Start menu */
+function toggleStart() {
+  const s = $('startmenu');
+  const btn = $('startBtn');
+  if (s.style.display === 'block') {
+    s.style.display = 'none';
+    btn.classList.remove('active');
+  } else {
+    s.style.display = 'block';
+    btn.classList.add('active');
+    $('startSearch').focus();
+  }
+}
+function hideStart() {
+  $('startmenu').style.display = 'none';
+  $('startBtn').classList.remove('active');
+}
+
+/* Context menu */
+function hideContext() { $('context').style.display = 'none'; }
+document.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  const c = $('context');
+  c.style.left = Math.min(e.clientX, innerWidth - 210) + 'px';
+  c.style.top = Math.min(e.clientY, innerHeight - 160) + 'px';
+  c.style.display = 'block';
+});
+document.addEventListener('click', e => {
+  if (!e.target.closest('#context')) hideContext();
+  if (!e.target.closest('#startmenu') && !e.target.closest('#startBtn')) hideStart();
+});
+
+/* Clock */
+function updateClock() {
+  const d = new Date();
+  $('time').textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  $('date').textContent = d.toLocaleDateString();
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+/* Notes */
+const notes = $('notes');
+notes.value = localStorage.getItem('web_app_notes') || '';
+notes.addEventListener('input', () => localStorage.setItem('web_app_notes', notes.value));
+
+/* Browser */
+function navigate() {
+  let u = $('url').value.trim();
+  if (!u) return;
+  if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+  $('url').value = u;
+  try { $('frame').src = u; } catch(e) {}
+}
+function openExternal() {
+  let u = $('url').value.trim();
+  if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+  window.open(u, '_blank', 'noopener,noreferrer');
+}
+
+/* Calculator */
+let calcExpr = '';
+function calcInput(v) {
+  if (calcExpr === '0' && v !== '.') calcExpr = '';
+  calcExpr += v;
+  $('calcDisplay').textContent = calcExpr;
+}
+function calcClear() {
+  calcExpr = '';
+  $('calcDisplay').textContent = '0';
+}
+function calcEval() {
+  try {
+    // Safe eval for simple math
+    const result = Function('"use strict"; return (' + calcExpr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-') + ')')();
+    calcExpr = String(result);
+    $('calcDisplay').textContent = calcExpr;
+  } catch {
+    $('calcDisplay').textContent = 'Erro';
+    calcExpr = '';
+  }
+}
+
+/* Paint */
+let paintReady = false;
+function initPaint() {
+  if (paintReady) return;
+  const canvas = $('paintCanvas');
+  const ctx = canvas.getContext('2d');
+  const resize = () => {
+    const parent = canvas.parentElement;
+    canvas.width = parent.clientWidth;
+    canvas.height = parent.clientHeight - 48;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  };
+  resize();
+  window.addEventListener('resize', () => { if ($('paint').style.display === 'block') resize(); });
+
+  let drawing = false;
+  const getPos = e => {
+    const r = canvas.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return { x: t.clientX - r.left, y: t.clientY - r.top };
+  };
+
+  const start = e => { e.preventDefault(); drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
+  const move = e => {
+    if (!drawing) return;
+    e.preventDefault();
+    const p = getPos(e);
+    ctx.strokeStyle = $('paintColor').value;
+    ctx.lineWidth = $('paintSize').value;
+    ctx.lineCap = 'round';
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+  };
+  const end = () => { drawing = false; };
+
+  canvas.addEventListener('pointerdown', start);
+  canvas.addEventListener('pointermove', move);
+  canvas.addEventListener('pointerup', end);
+  canvas.addEventListener('pointerleave', end);
+  paintReady = true;
+}
+function paintClear() {
+  const canvas = $('paintCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+/* Explorer */
+const folders = {
+  home: [
+    { name: 'Documentos', icon: '📁', action: () => navExplorer('docs') },
+    { name: 'Downloads', icon: '📁', action: () => navExplorer('downloads') },
+    { name: 'Imagens', icon: '🖼️', action: () => navExplorer('images') },
+    { name: 'ISO do Windows', icon: '💿', action: () => openWin('iso') },
+    { name: 'Lixeira', icon: '🗑️', action: () => navExplorer('trash') }
+  ],
+  docs: [
+    { name: 'Anotações.txt', icon: '📄', action: () => openWin('notepad') },
+    { name: 'Projeto web_app', icon: '📁', action: () => toast('Pasta local do projeto') }
+  ],
+  downloads: [
+    { name: 'Nenhum arquivo', icon: '📭', action: () => {} }
+  ],
+  images: [
+    { name: 'Wallpaper', icon: '🖼️', action: () => changeWallpaper() }
+  ],
+  iso: [
+    { name: 'Gerenciador de ISO', icon: '💿', action: () => openWin('iso') }
+  ],
+  trash: [
+    { name: 'Vazia', icon: '🗑️', action: () => {} }
+  ]
+};
+
+function navExplorer(folder) {
+  const files = folders[folder] || folders.home;
+  const names = { home: 'Este Computador', docs: 'Documentos', downloads: 'Downloads', images: 'Imagens', iso: 'Windows ISO', trash: 'Lixeira' };
+  $('explorerPath').value = names[folder] || folder;
+  $('explorerStatus').textContent = (names[folder] || folder) + ' • armazenamento local do navegador';
+
+  document.querySelectorAll('.side-item').forEach(el => el.classList.remove('active'));
+  const sideMap = { home: 0, docs: 1, downloads: 2, images: 3, iso: 4, trash: 5 };
+  const items = document.querySelectorAll('.side-item');
+  if (items[sideMap[folder]]) items[sideMap[folder]].classList.add('active');
+
+  const container = $('explorerFiles');
+  container.innerHTML = '';
+  files.forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'file';
+    div.innerHTML = `<span>${f.icon}</span>${f.name}`;
+    div.onclick = f.action;
+    container.appendChild(div);
+  });
+}
+navExplorer('home');
+
+/* Terminal */
+function terminalKey(e) {
+  if (e.key !== 'Enter') return;
+  const v = e.target.value.trim();
+  const o = $('termout');
+  const add = t => {
+    const d = document.createElement('div');
+    d.className = 'line';
+    d.innerHTML = t;
+    o.insertBefore(d, o.lastChild.previousSibling || o.lastChild);
+  };
+
+  if (v === 'help') {
+    add('Comandos: help, clear, date, time, about, calc, paint, iso, open [app], theme');
+  } else if (v === 'clear') {
+    o.innerHTML = '<span class="prompt">web_app&gt; </span><input id="term" onkeydown="terminalKey(event)" autocomplete="off">';
+    $('term').focus();
+    e.target.value = '';
+    return;
+  } else if (v === 'date') add(new Date().toLocaleDateString());
+  else if (v === 'time') add(new Date().toLocaleTimeString());
+  else if (v === 'about') add('web_app V3 — Desktop Windows 10 no navegador');
+  else if (v === 'calc') { openWin('calc'); add('Calculadora aberta.'); }
+  else if (v === 'paint') { openWin('paint'); add('Paint aberto.'); }
+  else if (v === 'iso') { openWin('iso'); add('Gerenciador de ISO aberto.'); }
+  else if (v === 'theme') { toggleTheme(); add('Tema alternado.'); }
+  else if (v.startsWith('open ')) {
+    const app = v.slice(5).trim();
+    const map = { explorer: 'explorer', files: 'explorer', browser: 'browser', notes: 'notepad', notepad: 'notepad', calc: 'calc', paint: 'paint', terminal: 'terminal', iso: 'iso', settings: 'settings' };
+    if (map[app]) { openWin(map[app]); add('Abrindo ' + app + '...'); }
+    else add('App não encontrado: ' + app);
+  } else if (v) add('Comando não encontrado: ' + v + ' — digite help');
+
+  e.target.value = '';
+  o.scrollTop = o.scrollHeight;
+}
+
+/* Search */
+function searchKey(e) {
+  if (e.key !== 'Enter') return;
+  const q = e.target.value.toLowerCase();
+  if (q.includes('iso') || q.includes('windows')) openWin('iso');
+  else if (q.includes('nota')) openWin('notepad');
+  else if (q.includes('calc') || q.includes('calcul')) openWin('calc');
+  else if (q.includes('paint') || q.includes('desen')) openWin('paint');
+  else if (q.includes('terminal') || q.includes('cmd')) openWin('terminal');
+  else if (q.includes('config')) openWin('settings');
+  else if (q.includes('arquivo') || q.includes('explorer')) openWin('explorer');
+  else if (q.includes('web') || q.includes('naveg') || q.includes('browser')) openWin('browser');
+  else toast('Nenhum aplicativo encontrado');
+  e.target.value = '';
+}
+
+function filterTiles() {
+  const q = $('startSearch').value.toLowerCase();
+  document.querySelectorAll('#startGrid .tile').forEach(x => {
+    x.style.display = x.dataset.name.includes(q) ? 'block' : 'none';
+  });
+}
+
+/* Theme & Wallpaper */
+const wallpapers = [
+  'linear-gradient(135deg, #0879b9 0%, #063d78 55%, #0a1628 100%)',
+  'linear-gradient(135deg, #1a2980 0%, #26d0ce 100%)',
+  'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
+  'linear-gradient(135deg, #141e30 0%, #243b55 100%)',
+  'linear-gradient(135deg, #000428 0%, #004e92 100%)',
+  'linear-gradient(160deg, #0c1445 0%, #1a3a6b 40%, #0d2137 100%)'
+];
+let wallIdx = 0;
+
+function toggleTheme() {
+  document.body.classList.toggle('dark');
+  localStorage.setItem('web_app_dark', document.body.classList.contains('dark') ? '1' : '0');
+  toast(document.body.classList.contains('dark') ? 'Tema escuro ativado' : 'Tema claro ativado');
+}
+function changeWallpaper() {
+  wallIdx = (wallIdx + 1) % wallpapers.length;
+  $('desktop').style.background = wallpapers[wallIdx];
+  localStorage.setItem('web_app_wall', wallIdx);
+  toast('Papel de parede alterado');
+}
+if (localStorage.getItem('web_app_dark') === '1') document.body.classList.add('dark');
+if (localStorage.getItem('web_app_wall')) {
+  wallIdx = parseInt(localStorage.getItem('web_app_wall')) || 0;
+  $('desktop').style.background = wallpapers[wallIdx];
+}
+
+/* ISO Manager */
+const isoDrop = $('isoDrop');
+$('isoFile').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const mb = (f.size / 1024 / 1024).toFixed(1);
+  $('isoInfo').innerHTML = `<b>${f.name}</b><br>Tamanho: ${mb} MB<br><span class="badge">ISO selecionada localmente</span>`;
+  localStorage.setItem('web_app_iso', JSON.stringify({ name: f.name, size: f.size }));
+  toast('ISO adicionada ao gerenciador');
+});
+
+// Drag & drop
+['dragenter', 'dragover'].forEach(ev => {
+  isoDrop.addEventListener(ev, e => { e.preventDefault(); isoDrop.classList.add('dragover'); });
+});
+['dragleave', 'drop'].forEach(ev => {
+  isoDrop.addEventListener(ev, e => { e.preventDefault(); isoDrop.classList.remove('dragover'); });
+});
+isoDrop.addEventListener('drop', e => {
+  const f = e.dataTransfer.files[0];
+  if (f) {
+    $('isoFile').files = e.dataTransfer.files;
+    $('isoFile').dispatchEvent(new Event('change'));
+  }
+});
+
+const savedIso = localStorage.getItem('web_app_iso');
+if (savedIso) {
+  try {
+    const x = JSON.parse(savedIso);
+    $('isoInfo').innerHTML = `<b>${x.name}</b><br>Tamanho: ${(x.size / 1024 / 1024).toFixed(1)} MB<br><span class="badge">ISO registrada neste navegador</span>`;
+  } catch {}
+}
+
+/* Clear data */
+function clearData() {
+  if (!confirm('Limpar todas as notas, preferências e ISO salvas?')) return;
+  localStorage.removeItem('web_app_notes');
+  localStorage.removeItem('web_app_iso');
+  localStorage.removeItem('web_app_dark');
+  localStorage.removeItem('web_app_wall');
+  notes.value = '';
+  $('isoInfo').textContent = 'Nenhuma ISO selecionada.';
+  document.body.classList.remove('dark');
+  toast('Dados locais limpos');
+}
+
+/* Toast */
+function toast(t) {
+  const el = $('toast');
+  el.textContent = t;
+  el.style.display = 'block';
+  clearTimeout(window._tt);
+  window._tt = setTimeout(() => { el.style.display = 'none'; }, 2400);
+}
+
+/* PWA service worker registration */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
 </script>
-</body></html>
+</body>
+</html>
