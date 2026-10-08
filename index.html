@@ -6,384 +6,315 @@
 <meta name="theme-color" content="#0078d4">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="description" content="web_app V3 — Desktop Windows 10 no navegador">
+<meta name="description" content="web_app — Desktop Windows 10 no navegador + Área de Trabalho Remota">
 <link rel="manifest" href="manifest.json">
-<title>web_app V3 — Windows Web</title>
+<title>web_app — Windows 10</title>
 <style>
 :root {
   --accent: #0078d4;
   --accent-hover: #106ebe;
-  --taskbar: #1a1a1aee;
-  --start-bg: #191919f5;
-  --window-bg: #f3f3f3;
-  --titlebar: #ffffff;
-  --text: #111;
-  --desktop-bg: linear-gradient(135deg, #0879b9 0%, #063d78 55%, #0a1628 100%);
+  --taskbar-h: 48px;
+  --titlebar-h: 32px;
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
 html, body {
-  margin: 0; width: 100%; height: 100%; overflow: hidden;
+  width: 100%; height: 100%; overflow: hidden;
   font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-  color: var(--text); background: #000;
+  background: #000; color: #111;
   touch-action: manipulation;
 }
-button, input, textarea, select { font: inherit; }
-button { cursor: pointer; border: none; background: none; }
+button, input, textarea, select { font: inherit; border: none; background: none; outline: none; }
+button { cursor: pointer; }
 
 /* ===== DESKTOP ===== */
 #desktop {
-  position: absolute; inset: 0 0 48px 0;
-  background: var(--desktop-bg);
-  overflow: hidden; transition: background 0.4s;
+  position: absolute; inset: 0 0 var(--taskbar-h) 0;
+  background: url('https://images.unsplash.com/photo-1557683316-973673baf926?w=1920&q=80') center/cover no-repeat,
+              linear-gradient(135deg, #0078d4, #001a33);
+  overflow: hidden;
 }
-.wall {
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(circle at 70% 30%, rgba(255,255,255,0.12), transparent 30%),
-    radial-gradient(circle at 20% 80%, rgba(0,120,212,0.15), transparent 40%);
-  pointer-events: none;
-}
-
-/* Desktop icons */
 .icons {
-  position: absolute; top: 12px; left: 8px;
-  display: flex; flex-direction: column; gap: 4px;
-  z-index: 5;
+  position: absolute; top: 12px; left: 10px;
+  display: flex; flex-direction: column; gap: 2px; z-index: 5;
 }
 .icon {
-  width: 86px; text-align: center; color: #fff;
-  font-size: 11px; padding: 8px 4px; border-radius: 4px;
-  text-shadow: 0 1px 3px #000a; user-select: none;
-  transition: background 0.15s;
+  width: 78px; text-align: center; color: #fff; font-size: 11px;
+  padding: 6px 2px; border-radius: 3px; text-shadow: 0 1px 3px #000c;
+  user-select: none; transition: background .12s;
 }
-.icon:active, .icon.selected { background: rgba(255,255,255,0.18); }
-.ico { display: block; font-size: 32px; margin-bottom: 3px; line-height: 1; }
+.icon:hover, .icon:active { background: rgba(255,255,255,.18); outline: 1px solid rgba(255,255,255,.3); }
+.ico { display: block; font-size: 30px; margin-bottom: 2px; line-height: 1.1; }
 
 /* ===== WINDOWS ===== */
 .window {
-  position: absolute; width: min(780px, 96vw); height: min(520px, 78vh);
-  min-width: 280px; min-height: 200px;
-  background: var(--window-bg); border: 1px solid #666;
-  box-shadow: 0 12px 48px rgba(0,0,0,0.45);
+  position: absolute;
+  width: min(820px, 96vw); height: min(540px, 80vh);
+  min-width: 300px; min-height: 220px;
+  background: #f0f0f0;
+  border: 1px solid #111;
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
   display: none; overflow: hidden;
-  border-radius: 6px 6px 0 0;
-  animation: winOpen 0.18s ease-out;
   z-index: 100;
 }
-.window.closing { animation: winClose 0.12s ease-in forwards; }
-@keyframes winOpen {
-  from { opacity: 0; transform: scale(0.95) translateY(12px); }
+.window.show { display: block; animation: openWin .15s ease-out; }
+@keyframes openWin {
+  from { opacity: 0; transform: scale(.97); }
   to { opacity: 1; transform: none; }
-}
-@keyframes winClose {
-  to { opacity: 0; transform: scale(0.97); }
 }
 .window.maximized {
   left: 0 !important; top: 0 !important;
   width: 100% !important; height: 100% !important;
-  border-radius: 0; border: none;
+  border: none;
 }
 
 .titlebar {
-  height: 36px; background: var(--titlebar);
+  height: var(--titlebar-h);
+  background: #fff;
   display: flex; align-items: center; justify-content: space-between;
-  padding-left: 12px; border-bottom: 1px solid #ddd;
+  padding-left: 10px;
+  border-bottom: 1px solid #ddd;
   cursor: grab; user-select: none;
+  font-size: 12px;
 }
 .titlebar:active { cursor: grabbing; }
-.titlebar b { font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
-.controls { height: 100%; display: flex; }
+.titlebar b { font-weight: 400; display: flex; align-items: center; gap: 6px; }
+.controls { display: flex; height: 100%; }
 .controls button {
-  width: 46px; height: 100%; font-size: 14px; color: #333;
-  transition: background 0.1s;
+  width: 46px; height: 100%; font-size: 11px; color: #222;
+  transition: background .1s;
 }
 .controls button:hover { background: #e5e5e5; }
 .controls .close:hover { background: #e81123; color: #fff; }
 
-.content { height: calc(100% - 36px); overflow: auto; background: #fff; }
+.content { height: calc(100% - var(--titlebar-h)); overflow: auto; background: #fff; }
 
-/* Toolbar */
+/* Common UI */
 .toolbar {
-  padding: 7px 10px; border-bottom: 1px solid #e0e0e0;
-  background: #fafafa; display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
+  display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
+  padding: 6px 10px; background: #f5f5f5; border-bottom: 1px solid #ddd;
 }
 .toolbar input {
-  flex: 1; min-width: 100px; padding: 6px 10px;
-  border: 1px solid #ccc; border-radius: 3px; outline: none;
+  flex: 1; min-width: 80px; padding: 5px 8px;
+  border: 1px solid #ccc; border-radius: 2px; background: #fff;
 }
-.toolbar input:focus { border-color: var(--accent); }
 .btn {
-  padding: 6px 12px; border: 1px solid #ccc; background: #f0f0f0;
-  border-radius: 3px; font-size: 13px; transition: background 0.1s;
+  padding: 5px 12px; border: 1px solid #adadad; background: #e1e1e1;
+  border-radius: 2px; font-size: 12px;
 }
-.btn:hover { background: #e0e0e0; }
+.btn:hover { background: #d0d0d0; }
 .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
 .btn.primary:hover { background: var(--accent-hover); }
 
 /* Explorer */
-.explorer { display: grid; grid-template-columns: 170px 1fr; height: calc(100% - 48px); }
-.side { background: #f5f5f5; border-right: 1px solid #e0e0e0; padding: 8px; overflow-y: auto; }
+.explorer { display: grid; grid-template-columns: 160px 1fr; height: calc(100% - 40px); }
+.side { background: #f3f3f3; border-right: 1px solid #ddd; padding: 6px; overflow-y: auto; }
 .side-item {
-  padding: 8px 10px; border-radius: 4px; font-size: 13px;
-  cursor: pointer; display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border-radius: 2px; font-size: 12px;
+  cursor: pointer; display: flex; gap: 8px; align-items: center;
 }
-.side-item:hover, .side-item.active { background: #e5f1fb; }
+.side-item:hover, .side-item.active { background: #cce8ff; }
 .files {
-  padding: 16px; display: grid;
-  grid-template-columns: repeat(auto-fill, 100px); gap: 10px; align-content: start;
+  padding: 14px; display: grid;
+  grid-template-columns: repeat(auto-fill, 96px); gap: 8px; align-content: start;
 }
 .file {
-  text-align: center; padding: 10px 6px; border-radius: 4px;
-  font-size: 12px; cursor: pointer; transition: background 0.1s;
+  text-align: center; padding: 8px 4px; border-radius: 2px;
+  font-size: 11px; cursor: pointer;
 }
-.file:hover { background: #e8f3fb; }
-.file span { display: block; font-size: 36px; margin-bottom: 4px; }
+.file:hover { background: #cce8ff; outline: 1px solid #99d1ff; }
+.file span { display: block; font-size: 32px; margin-bottom: 2px; }
 .status-bar {
-  padding: 4px 12px; border-top: 1px solid #e0e0e0;
-  font-size: 12px; color: #666; background: #fafafa;
+  padding: 3px 10px; border-top: 1px solid #ddd;
+  font-size: 11px; color: #555; background: #f5f5f5;
 }
 
 /* Notepad */
 .notepad {
   width: 100%; height: 100%; border: 0; resize: none;
-  padding: 14px; outline: 0; font: 14px Consolas, "Courier New", monospace;
+  padding: 10px; font: 13px Consolas, "Courier New", monospace;
 }
 
 /* Browser */
 .browser { display: flex; flex-direction: column; height: 100%; }
-.browser iframe { border: 0; flex: 1; width: 100%; background: #fff; }
+.browser iframe { flex: 1; border: 0; width: 100%; }
 
 /* Terminal */
 .terminal {
-  height: 100%; background: #0c0c0c; color: #cccccc;
-  padding: 12px; font: 13px Consolas, monospace; overflow: auto;
+  height: 100%; background: #0c0c0c; color: #ccc;
+  padding: 10px; font: 13px Consolas, monospace; overflow: auto;
 }
 .terminal input {
-  background: transparent; color: #fff; border: 0; outline: 0;
-  width: 70%; font: inherit;
+  background: transparent; color: #fff; width: 65%; font: inherit;
 }
-.terminal .line { white-space: pre-wrap; margin-bottom: 2px; }
 .terminal .prompt { color: #16c60c; }
 
 /* Calculator */
 .calc {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
-  padding: 16px; max-width: 280px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+  padding: 12px; max-width: 260px; margin: 12px auto;
 }
 .calc-display {
   grid-column: 1 / -1; background: #1a1a1a; color: #fff;
-  font-size: 28px; padding: 16px; text-align: right;
-  border-radius: 6px; font-family: Consolas, monospace;
-  min-height: 56px; word-break: break-all;
+  font-size: 26px; padding: 14px; text-align: right;
+  border-radius: 4px; min-height: 50px; font-family: Consolas, monospace;
 }
 .calc button {
-  padding: 16px; font-size: 18px; border-radius: 6px;
-  background: #f0f0f0; transition: background 0.1s;
+  padding: 14px; font-size: 16px; border-radius: 4px; background: #f0f0f0;
 }
 .calc button:hover { background: #e0e0e0; }
 .calc button.op { background: #e8e8e8; }
 .calc button.eq { background: var(--accent); color: #fff; }
-.calc button.eq:hover { background: var(--accent-hover); }
 
-/* Paint */
-.paint-area { display: flex; flex-direction: column; height: 100%; }
-.paint-tools {
-  padding: 8px; background: #f5f5f5; border-bottom: 1px solid #ddd;
-  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+/* Remote Desktop */
+.rdp-box { padding: 20px; max-width: 480px; margin: 0 auto; }
+.rdp-box h2 { margin-bottom: 8px; font-weight: 400; }
+.rdp-box p { font-size: 13px; color: #555; margin-bottom: 16px; line-height: 1.45; }
+.rdp-box label { display: block; font-size: 12px; margin: 10px 0 4px; color: #333; }
+.rdp-box input, .rdp-box select {
+  width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 2px;
+  background: #fff;
 }
-.paint-tools input[type=color] { width: 36px; height: 32px; border: 1px solid #ccc; padding: 2px; }
-#paintCanvas {
-  flex: 1; background: #fff; cursor: crosshair;
-  touch-action: none;
+.rdp-actions { margin-top: 18px; display: flex; gap: 8px; flex-wrap: wrap; }
+.rdp-note {
+  margin-top: 20px; padding: 12px; background: #fff8e1; border: 1px solid #ffe082;
+  border-radius: 4px; font-size: 12px; color: #5d4037; line-height: 1.4;
 }
 
-/* Settings & cards */
-.settings { padding: 20px; }
+/* Settings */
+.settings { padding: 18px; }
 .card {
-  border: 1px solid #e0e0e0; padding: 16px; margin: 12px 0;
-  background: #fafafa; border-radius: 6px;
+  border: 1px solid #ddd; padding: 14px; margin: 10px 0;
+  background: #fafafa; border-radius: 4px;
 }
-.card h3 { margin: 0 0 8px; font-size: 15px; }
+.card h3 { font-size: 14px; margin-bottom: 6px; font-weight: 500; }
 .badge {
-  display: inline-block; padding: 3px 8px; border-radius: 10px;
-  background: #dff2ff; color: #075985; font-size: 11px; font-weight: 500;
+  display: inline-block; padding: 2px 8px; border-radius: 10px;
+  background: #e3f2fd; color: #1565c0; font-size: 11px;
 }
+
+/* ISO */
 .iso-drop {
-  border: 2px dashed #bbb; border-radius: 8px; padding: 28px;
-  text-align: center; margin: 14px 0; background: #fafafa;
-  transition: border-color 0.2s, background 0.2s;
-}
-.iso-drop.dragover { border-color: var(--accent); background: #e8f4fc; }
-.vm-screen {
-  margin: 12px 0; background: #111; color: #999;
-  min-height: 180px; display: grid; place-items: center;
-  text-align: center; border-radius: 6px; padding: 24px;
+  border: 2px dashed #bbb; border-radius: 6px; padding: 24px;
+  text-align: center; margin: 12px 0; background: #fafafa;
 }
 
 /* ===== TASKBAR ===== */
 #taskbar {
-  position: absolute; left: 0; right: 0; bottom: 0; height: 48px;
-  background: var(--taskbar); backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  display: flex; align-items: center; color: #fff; z-index: 10000;
+  position: absolute; left: 0; right: 0; bottom: 0; height: var(--taskbar-h);
+  background: #1f1f1f; display: flex; align-items: center; color: #fff; z-index: 10000;
 }
 .startbtn {
-  height: 48px; width: 50px; color: #fff; font-size: 22px;
-  transition: background 0.15s;
+  width: 48px; height: 100%; color: #fff; font-size: 20px;
+  transition: background .12s;
 }
-.startbtn:hover, .startbtn.active { background: rgba(255,255,255,0.12); }
+.startbtn:hover, .startbtn.active { background: rgba(255,255,255,.12); }
 .search-box {
-  height: 32px; width: min(240px, 30vw); margin-left: 4px;
-  padding: 0 12px; border: none; border-radius: 2px;
-  background: #333; color: #fff; outline: none;
+  height: 32px; width: min(220px, 28vw); margin-left: 2px;
+  padding: 0 10px; background: #333; color: #fff; border-radius: 0;
 }
-.search-box::placeholder { color: #aaa; }
-.search-box:focus { background: #444; }
-.tasks { display: flex; height: 100%; margin-left: 6px; gap: 2px; }
+.search-box::placeholder { color: #999; }
+.tasks { display: flex; height: 100%; margin-left: 4px; }
 .task {
-  min-width: 48px; height: 48px; color: #fff; font-size: 18px;
-  position: relative; transition: background 0.15s;
+  min-width: 46px; height: 100%; color: #fff; font-size: 17px;
+  position: relative; transition: background .12s;
 }
-.task:hover { background: rgba(255,255,255,0.1); }
+.task:hover { background: rgba(255,255,255,.1); }
 .task.active::after {
-  content: ''; position: absolute; bottom: 0; left: 20%; right: 20%;
-  height: 3px; background: var(--accent); border-radius: 2px 2px 0 0;
+  content: ''; position: absolute; bottom: 0; left: 25%; right: 25%;
+  height: 3px; background: var(--accent);
 }
 .tray {
   margin-left: auto; display: flex; align-items: center;
-  gap: 10px; padding: 0 12px; font-size: 13px;
+  gap: 10px; padding: 0 12px; font-size: 12px;
 }
-.clock { text-align: right; line-height: 15px; font-size: 12px; }
+.clock { text-align: right; line-height: 14px; font-size: 11px; }
 
 /* ===== START MENU ===== */
 #startmenu {
-  position: absolute; bottom: 48px; left: 0;
-  width: min(620px, 100vw); height: min(560px, calc(100vh - 48px));
-  background: var(--start-bg); color: #fff;
-  display: none; z-index: 11000; padding: 16px 20px;
-  box-shadow: 0 0 40px #000a; border-radius: 0 8px 0 0;
-  animation: startOpen 0.18s ease-out;
+  position: absolute; bottom: var(--taskbar-h); left: 0;
+  width: min(580px, 100vw); height: min(520px, calc(100vh - var(--taskbar-h)));
+  background: #1c1c1c; color: #fff; display: none; z-index: 11000;
+  box-shadow: 0 0 30px #000a;
 }
-@keyframes startOpen {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: none; }
+.start-left {
+  width: 48px; background: #111; height: 100%; float: left;
+  display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 8px;
 }
-.start-head { font-size: 16px; margin-bottom: 12px; font-weight: 500; }
+.start-left button { width: 48px; height: 44px; color: #ccc; font-size: 16px; }
+.start-left button:hover { background: #333; color: #fff; }
+.start-main { margin-left: 48px; padding: 14px 16px; height: 100%; overflow-y: auto; }
 .start-search {
-  width: 100%; padding: 10px 14px; margin-bottom: 14px;
-  border: none; border-radius: 4px; background: #2a2a2a; color: #fff;
-  outline: none;
+  width: 100%; padding: 8px 12px; margin-bottom: 12px;
+  background: #2a2a2a; color: #fff; border-radius: 2px;
 }
-.start-search:focus { background: #333; }
 .start-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 8px; overflow-y: auto; max-height: calc(100% - 100px);
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 6px;
 }
 .tile {
-  height: 90px; background: #1668a7; border: none; color: #fff;
-  text-align: left; padding: 12px; border-radius: 4px;
-  font-size: 13px; transition: filter 0.15s, transform 0.1s;
+  height: 84px; background: #1668a7; color: #fff; text-align: left;
+  padding: 10px; font-size: 12px; border-radius: 0;
+  transition: filter .12s;
 }
-.tile:hover { filter: brightness(1.15); }
-.tile:active { transform: scale(0.97); }
-.tile small { display: block; margin-top: 6px; opacity: 0.75; font-size: 11px; }
+.tile:hover { filter: brightness(1.12); }
+.tile small { display: block; margin-top: 4px; opacity: .75; font-size: 10px; }
 .tile.green { background: #107c10; }
 .tile.orange { background: #ca5010; }
 .tile.purple { background: #5c2d91; }
 .tile.teal { background: #008272; }
 .tile.red { background: #c42b1c; }
+.tile.dark { background: #2d2d2d; }
 
-/* Context menu */
+/* Context & Toast */
 #context {
-  position: absolute; display: none; background: #fff; color: #111;
-  border: 1px solid #ccc; box-shadow: 0 6px 24px #0005;
-  z-index: 20000; width: 200px; border-radius: 4px; overflow: hidden;
+  position: absolute; display: none; background: #fff;
+  border: 1px solid #ccc; box-shadow: 0 4px 16px #0004;
+  z-index: 20000; width: 190px;
 }
-.ctx { padding: 9px 14px; font-size: 13px; cursor: pointer; }
-.ctx:hover { background: #e5f3ff; }
-.ctx.sep { border-top: 1px solid #eee; margin-top: 2px; padding-top: 10px; }
-
-/* Toast */
+.ctx { padding: 8px 14px; font-size: 12px; cursor: pointer; }
+.ctx:hover { background: #cce8ff; }
+.ctx.sep { border-top: 1px solid #eee; }
 .toast {
-  position: absolute; right: 16px; bottom: 60px;
-  background: #222; color: #fff; padding: 12px 18px;
-  border-radius: 6px; display: none; z-index: 25000;
-  box-shadow: 0 4px 20px #0006; font-size: 13px;
-  animation: toastIn 0.25s ease;
-}
-@keyframes toastIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: none; }
+  position: absolute; right: 14px; bottom: 58px;
+  background: #222; color: #fff; padding: 10px 16px;
+  border-radius: 4px; display: none; z-index: 25000; font-size: 12px;
 }
 
 /* Login */
 #login {
   position: fixed; inset: 0;
-  background: linear-gradient(145deg, #0078d4 0%, #001a33 100%);
+  background: linear-gradient(160deg, #0078d4 0%, #001a2e 100%);
   z-index: 30000; color: #fff; display: grid; place-items: center;
 }
-.login-box { text-align: center; width: min(340px, 90vw); }
+.login-box { text-align: center; width: min(320px, 90vw); }
 .avatar {
-  width: 90px; height: 90px; border-radius: 50%;
-  background: rgba(255,255,255,0.15); display: grid; place-items: center;
-  font-size: 42px; margin: 0 auto 12px;
+  width: 84px; height: 84px; border-radius: 50%;
+  background: rgba(255,255,255,.12); display: grid; place-items: center;
+  font-size: 40px; margin: 0 auto 10px;
 }
-.login-box h2 { margin: 0 0 4px; font-weight: 400; }
+.login-box h2 { font-weight: 300; font-size: 22px; margin-bottom: 4px; }
 .login-box input {
-  width: 100%; padding: 12px 14px; border: none; margin: 14px 0 8px;
-  border-radius: 4px; background: rgba(255,255,255,0.9); color: #111;
-  outline: none;
+  width: 100%; padding: 10px 12px; margin: 12px 0 8px;
+  background: rgba(255,255,255,.92); color: #111; border-radius: 2px;
 }
 .login-box button {
-  padding: 11px 32px; border: none; background: #fff;
-  color: #075985; border-radius: 4px; font-weight: 500;
-  transition: background 0.15s;
+  padding: 9px 28px; background: #fff; color: #075985;
+  border-radius: 2px; font-weight: 500;
 }
-.login-box button:hover { background: #f0f0f0; }
-.login-error { height: 20px; color: #ffb4b4; font-size: 13px; margin-top: 6px; }
 .login-skip {
-  display: block; margin-top: 16px; color: rgba(255,255,255,0.6);
-  font-size: 13px; text-decoration: underline; cursor: pointer;
+  display: block; margin-top: 14px; color: rgba(255,255,255,.55);
+  font-size: 12px; text-decoration: underline; cursor: pointer;
 }
 
-/* Mobile adjustments */
 @media (max-width: 700px) {
-  .window { width: 96vw; height: 76vh; left: 2vw !important; top: 2vh !important; }
-  .search-box { width: 120px; }
-  .start-grid { grid-template-columns: repeat(2, 1fr); }
+  .window { width: 97vw; height: 78vh; left: 1.5vw !important; top: 1.5vh !important; }
+  .search-box { width: 110px; }
   .explorer { grid-template-columns: 1fr; }
   .side { display: none; }
   .tray span:not(.clock) { display: none; }
-  .icons { gap: 2px; }
-  .icon { width: 76px; font-size: 10px; }
-  .ico { font-size: 28px; }
+  .icon { width: 70px; font-size: 10px; }
+  .ico { font-size: 26px; }
 }
-
-/* Dark theme overrides */
-body.dark {
-  --window-bg: #2b2b2b;
-  --titlebar: #323232;
-  --text: #eee;
-}
-body.dark .content { background: #1e1e1e; color: #eee; }
-body.dark .titlebar { border-bottom-color: #444; color: #eee; }
-body.dark .controls button { color: #ccc; }
-body.dark .controls button:hover { background: #444; }
-body.dark .toolbar { background: #2b2b2b; border-bottom-color: #444; }
-body.dark .toolbar input { background: #1e1e1e; border-color: #555; color: #eee; }
-body.dark .btn { background: #3a3a3a; border-color: #555; color: #eee; }
-body.dark .btn:hover { background: #4a4a4a; }
-body.dark .side { background: #252525; border-right-color: #444; }
-body.dark .side-item:hover, body.dark .side-item.active { background: #333; }
-body.dark .file:hover { background: #333; }
-body.dark .status-bar { background: #252525; border-top-color: #444; color: #aaa; }
-body.dark .card { background: #252525; border-color: #444; }
-body.dark .iso-drop { background: #252525; border-color: #555; }
-body.dark .notepad { background: #1e1e1e; color: #eee; }
-body.dark .calc button { background: #3a3a3a; color: #eee; }
-body.dark .calc button.op { background: #333; }
-body.dark .paint-tools { background: #2b2b2b; border-bottom-color: #444; }
 </style>
 </head>
 <body>
@@ -393,47 +324,28 @@ body.dark .paint-tools { background: #2b2b2b; border-bottom-color: #444; }
   <div class="login-box">
     <div class="avatar">👤</div>
     <h2>Us</h2>
-    <div style="opacity:0.8;font-size:14px">web_app V3</div>
+    <div style="opacity:.7;font-size:13px">web_app</div>
     <input id="senha" type="password" placeholder="Senha (opcional)" autocomplete="off">
     <button onclick="entrar()">Entrar</button>
-    <div id="loginError" class="login-error"></div>
-    <span class="login-skip" onclick="entrar(true)">Pular login →</span>
-    <div style="margin-top:20px;font-size:12px;opacity:0.5">Desktop web inspirado no Windows 10</div>
+    <span class="login-skip" onclick="entrar(true)">Pular →</span>
   </div>
 </div>
 
 <!-- DESKTOP -->
 <div id="desktop">
-  <div class="wall"></div>
-  <div class="icons" id="desktopIcons">
-    <div class="icon" ondblclick="openWin('explorer')" ontouchend="handleIconTap(event,'explorer')">
-      <span class="ico">🖥️</span>Este Computador
-    </div>
-    <div class="icon" ondblclick="openWin('browser')" ontouchend="handleIconTap(event,'browser')">
-      <span class="ico">🌐</span>Navegador
-    </div>
-    <div class="icon" ondblclick="openWin('notepad')" ontouchend="handleIconTap(event,'notepad')">
-      <span class="ico">📝</span>Bloco de Notas
-    </div>
-    <div class="icon" ondblclick="openWin('calc')" ontouchend="handleIconTap(event,'calc')">
-      <span class="ico">🔢</span>Calculadora
-    </div>
-    <div class="icon" ondblclick="openWin('paint')" ontouchend="handleIconTap(event,'paint')">
-      <span class="ico">🎨</span>Paint
-    </div>
-    <div class="icon" ondblclick="openWin('terminal')" ontouchend="handleIconTap(event,'terminal')">
-      <span class="ico">⌨️</span>Terminal
-    </div>
-    <div class="icon" ondblclick="openWin('iso')" ontouchend="handleIconTap(event,'iso')">
-      <span class="ico">💿</span>Windows ISO
-    </div>
-    <div class="icon" ondblclick="openWin('settings')" ontouchend="handleIconTap(event,'settings')">
-      <span class="ico">⚙️</span>Configurações
-    </div>
+  <div class="icons">
+    <div class="icon" ondblclick="openWin('explorer')" ontouchend="tapIcon(event,'explorer')"><span class="ico">🖥️</span>Este PC</div>
+    <div class="icon" ondblclick="openWin('rdp')" ontouchend="tapIcon(event,'rdp')"><span class="ico">🪟</span>Windows Real</div>
+    <div class="icon" ondblclick="openWin('browser')" ontouchend="tapIcon(event,'browser')"><span class="ico">🌐</span>Edge</div>
+    <div class="icon" ondblclick="openWin('notepad')" ontouchend="tapIcon(event,'notepad')"><span class="ico">📝</span>Bloco de Notas</div>
+    <div class="icon" ondblclick="openWin('calc')" ontouchend="tapIcon(event,'calc')"><span class="ico">🔢</span>Calculadora</div>
+    <div class="icon" ondblclick="openWin('terminal')" ontouchend="tapIcon(event,'terminal')"><span class="ico">⌨️</span>CMD</div>
+    <div class="icon" ondblclick="openWin('iso')" ontouchend="tapIcon(event,'iso')"><span class="ico">💿</span>ISO</div>
+    <div class="icon" ondblclick="openWin('settings')" ontouchend="tapIcon(event,'settings')"><span class="ico">⚙️</span>Configurações</div>
   </div>
 
   <!-- EXPLORER -->
-  <div class="window" id="explorer" style="left:60px;top:40px">
+  <div class="window" id="explorer" style="left:50px;top:30px">
     <div class="titlebar" data-win="explorer">
       <b>📁 Este Computador</b>
       <div class="controls">
@@ -443,44 +355,74 @@ body.dark .paint-tools { background: #2b2b2b; border-bottom-color: #444; }
       </div>
     </div>
     <div class="content">
-      <div class="toolbar">
-        <button class="btn" onclick="navExplorer('home')">←</button>
-        <input id="explorerPath" value="Este Computador" readonly>
-      </div>
+      <div class="toolbar"><input value="Este Computador" readonly></div>
       <div class="explorer">
         <div class="side">
-          <div class="side-item active" onclick="navExplorer('home')">🏠 Início</div>
-          <div class="side-item" onclick="navExplorer('docs')">📄 Documentos</div>
-          <div class="side-item" onclick="navExplorer('downloads')">⬇️ Downloads</div>
-          <div class="side-item" onclick="navExplorer('images')">🖼️ Imagens</div>
-          <div class="side-item" onclick="navExplorer('iso')">💿 Windows ISO</div>
-          <div class="side-item" onclick="navExplorer('trash')">🗑️ Lixeira</div>
+          <div class="side-item active">🏠 Início</div>
+          <div class="side-item">📄 Documentos</div>
+          <div class="side-item">⬇️ Downloads</div>
+          <div class="side-item">🖼️ Imagens</div>
+          <div class="side-item" onclick="openWin('iso')">💿 ISO</div>
         </div>
-        <div class="files" id="explorerFiles"></div>
+        <div class="files">
+          <div class="file" onclick="openWin('rdp')"><span>🪟</span>Windows Real</div>
+          <div class="file" onclick="openWin('iso')"><span>💿</span>ISO Windows</div>
+          <div class="file" onclick="openWin('notepad')"><span>📄</span>Documentos</div>
+          <div class="file"><span>📁</span>Downloads</div>
+          <div class="file"><span>🖼️</span>Imagens</div>
+        </div>
       </div>
-      <div class="status-bar" id="explorerStatus">Este Computador • armazenamento local</div>
+      <div class="status-bar">5 itens • armazenamento local</div>
     </div>
   </div>
 
-  <!-- NOTEPAD -->
-  <div class="window" id="notepad" style="left:120px;top:70px">
-    <div class="titlebar" data-win="notepad">
-      <b>📝 Bloco de Notas</b>
+  <!-- WINDOWS REAL (RDP / Remote) -->
+  <div class="window" id="rdp" style="left:80px;top:40px">
+    <div class="titlebar" data-win="rdp">
+      <b>🪟 Windows 10 Real — Área de Trabalho Remota</b>
       <div class="controls">
-        <button onclick="minWin('notepad')">—</button>
-        <button onclick="maxWin('notepad')">□</button>
-        <button class="close" onclick="closeWin('notepad')">×</button>
+        <button onclick="minWin('rdp')">—</button>
+        <button onclick="maxWin('rdp')">□</button>
+        <button class="close" onclick="closeWin('rdp')">×</button>
       </div>
     </div>
-    <div class="content" style="padding:0">
-      <textarea class="notepad" id="notes" placeholder="Digite aqui..."></textarea>
+    <div class="content">
+      <div class="rdp-box">
+        <h2>Conectar a um Windows real</h2>
+        <p>
+          O navegador <strong>não consegue executar Windows 10 de verdade</strong> sozinho.<br>
+          Para usar um Windows real, conecte-se a um PC ou servidor via Área de Trabalho Remota.
+        </p>
+
+        <label>Endereço do servidor (IP ou domínio)</label>
+        <input id="rdpHost" placeholder="ex: 192.168.1.10  ou  meu-windows.exemplo.com">
+
+        <label>Porta (padrão RDP: 3389)</label>
+        <input id="rdpPort" value="3389" type="number">
+
+        <label>Usuário (opcional)</label>
+        <input id="rdpUser" placeholder="Administrador">
+
+        <div class="rdp-actions">
+          <button class="btn primary" onclick="connectRDP()">Conectar</button>
+          <button class="btn" onclick="window.open('https://www.microsoft.com/pt-br/windows/windows-365','_blank')">Windows 365 (nuvem)</button>
+        </div>
+
+        <div class="rdp-note">
+          <strong>Como ter um Windows real:</strong><br>
+          1. No seu PC Windows: ative “Área de Trabalho Remota” nas Configurações.<br>
+          2. Ou alugue um VPS barato com Windows (Contabo, Azure, etc.).<br>
+          3. Ou use <b>Windows 365</b> / Shadow / qualquer Cloud PC.<br><br>
+          Depois use um cliente web como <b>Apache Guacamole</b> ou o app nativo de Área de Trabalho Remota do celular.
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- BROWSER -->
-  <div class="window" id="browser" style="left:160px;top:50px">
+  <div class="window" id="browser" style="left:120px;top:50px">
     <div class="titlebar" data-win="browser">
-      <b>🌐 Navegador Web</b>
+      <b>🌐 Microsoft Edge</b>
       <div class="controls">
         <button onclick="minWin('browser')">—</button>
         <button onclick="maxWin('browser')">□</button>
@@ -497,8 +439,23 @@ body.dark .paint-tools { background: #2b2b2b; border-bottom-color: #444; }
     </div>
   </div>
 
+  <!-- NOTEPAD -->
+  <div class="window" id="notepad" style="left:150px;top:70px">
+    <div class="titlebar" data-win="notepad">
+      <b>📝 Bloco de Notas</b>
+      <div class="controls">
+        <button onclick="minWin('notepad')">—</button>
+        <button onclick="maxWin('notepad')">□</button>
+        <button class="close" onclick="closeWin('notepad')">×</button>
+      </div>
+    </div>
+    <div class="content" style="padding:0">
+      <textarea class="notepad" id="notes" placeholder="Digite aqui..."></textarea>
+    </div>
+  </div>
+
   <!-- CALCULATOR -->
-  <div class="window" id="calc" style="left:200px;top:80px;width:300px;height:420px">
+  <div class="window" id="calc" style="left:180px;top:60px;width:280px;height:400px">
     <div class="titlebar" data-win="calc">
       <b>🔢 Calculadora</b>
       <div class="controls">
@@ -507,7 +464,7 @@ body.dark .paint-tools { background: #2b2b2b; border-bottom-color: #444; }
         <button class="close" onclick="closeWin('calc')">×</button>
       </div>
     </div>
-    <div class="content" style="padding:0;display:flex;align-items:center;justify-content:center">
+    <div class="content" style="display:flex;align-items:center;justify-content:center">
       <div class="calc">
         <div class="calc-display" id="calcDisplay">0</div>
         <button onclick="calcClear()">C</button>
@@ -533,32 +490,10 @@ body.dark .paint-tools { background: #2b2b2b; border-bottom-color: #444; }
     </div>
   </div>
 
-  <!-- PAINT -->
-  <div class="window" id="paint" style="left:100px;top:40px;width:640px;height:480px">
-    <div class="titlebar" data-win="paint">
-      <b>🎨 Paint</b>
-      <div class="controls">
-        <button onclick="minWin('paint')">—</button>
-        <button onclick="maxWin('paint')">□</button>
-        <button class="close" onclick="closeWin('paint')">×</button>
-      </div>
-    </div>
-    <div class="content" style="padding:0">
-      <div class="paint-area">
-        <div class="paint-tools">
-          <label>Cor: <input type="color" id="paintColor" value="#000000"></label>
-          <label>Tamanho: <input type="range" id="paintSize" min="1" max="30" value="3"></label>
-          <button class="btn" onclick="paintClear()">Limpar</button>
-        </div>
-        <canvas id="paintCanvas"></canvas>
-      </div>
-    </div>
-  </div>
-
   <!-- TERMINAL -->
-  <div class="window" id="terminal" style="left:220px;top:90px;background:#0c0c0c">
+  <div class="window" id="terminal" style="left:200px;top:80px">
     <div class="titlebar" data-win="terminal" style="background:#202020;color:#fff;border-bottom-color:#333">
-      <b>⌨️ Terminal</b>
+      <b>⌨️ Prompt de Comando</b>
       <div class="controls">
         <button style="color:#ccc" onclick="minWin('terminal')">—</button>
         <button style="color:#ccc" onclick="maxWin('terminal')">□</button>
@@ -566,57 +501,50 @@ body.dark .paint-tools { background: #2b2b2b; border-bottom-color: #444; }
       </div>
     </div>
     <div class="terminal" id="termout">
-      <div class="line">web_app Terminal V3</div>
-      <div class="line">Digite <b>help</b> para ver os comandos.</div>
+      <div>Microsoft Windows [Versão 10.0.19045.3800]</div>
+      <div>(c) Microsoft Corporation. Todos os direitos reservados.</div>
       <br>
-      <span class="prompt">web_app&gt; </span><input id="term" onkeydown="terminalKey(event)" autocomplete="off">
+      <span class="prompt">C:\Users\User&gt; </span><input id="term" onkeydown="terminalKey(event)" autocomplete="off">
     </div>
   </div>
 
-  <!-- ISO MANAGER -->
-  <div class="window" id="iso" style="left:140px;top:45px">
+  <!-- ISO -->
+  <div class="window" id="iso" style="left:100px;top:40px">
     <div class="titlebar" data-win="iso">
-      <b>💿 Windows ISO / Máquina Virtual</b>
+      <b>💿 Gerenciador de ISO — Windows</b>
       <div class="controls">
         <button onclick="minWin('iso')">—</button>
         <button onclick="maxWin('iso')">□</button>
         <button class="close" onclick="closeWin('iso')">×</button>
       </div>
     </div>
-    <div class="content" style="padding:18px">
-      <h2 style="margin-top:0">Windows ISO</h2>
-      <p>Baixe a ISO oficial da Microsoft ou selecione uma ISO que já esteja no seu dispositivo.</p>
+    <div class="content" style="padding:16px">
+      <h2 style="font-weight:400;margin-bottom:8px">Windows ISO</h2>
+      <p style="font-size:13px;color:#555;margin-bottom:14px">Baixe a ISO oficial da Microsoft. A licença é por conta do usuário.</p>
 
       <div class="card">
-        <b>Downloads oficiais</b>
-        <p style="margin:8px 0;font-size:13px;color:#555">Windows 10 e Windows 11 são fornecidos gratuitamente pela Microsoft (licença necessária para ativação).</p>
-        <button class="btn primary" onclick="window.open('https://www.microsoft.com/software-download/windows11','_blank')">Windows 11 ISO</button>
-        <button class="btn" onclick="window.open('https://www.microsoft.com/software-download/windows10ISO','_blank')">Windows 10 ISO</button>
+        <button class="btn primary" onclick="window.open('https://www.microsoft.com/software-download/windows11','_blank')">Baixar Windows 11 ISO</button>
+        <button class="btn" style="margin-left:6px" onclick="window.open('https://www.microsoft.com/software-download/windows10ISO','_blank')">Baixar Windows 10 ISO</button>
       </div>
 
-      <div class="iso-drop" id="isoDrop">
-        <b>📁 Adicionar ISO local</b>
-        <p style="margin:8px 0"><input id="isoFile" type="file" accept=".iso,application/octet-stream"></p>
-        <small style="color:#777">O arquivo fica apenas no seu dispositivo. Nada é enviado para servidores.</small>
+      <div class="iso-drop">
+        <b>Selecionar ISO local</b><br><br>
+        <input type="file" id="isoFile" accept=".iso">
+        <div id="isoInfo" style="margin-top:10px;font-size:12px;color:#666">Nenhuma ISO selecionada</div>
       </div>
 
-      <div id="isoInfo" class="card">Nenhuma ISO selecionada.</div>
-
-      <div class="vm-screen">
-        <div>
-          <h3 style="margin:0 0 8px;color:#ccc">Máquina Virtual</h3>
-          <p style="font-size:13px;max-width:340px;margin:0 auto 12px">
-            O navegador não consegue executar Windows nativamente só com HTML.<br>
-            Para VM real use a versão Android com QEMU, ou conecte-se a um PC remoto.
-          </p>
-          <span class="badge">Gerenciador de ISO ativo</span>
-        </div>
+      <div class="card" style="margin-top:12px">
+        <span class="badge">Importante</span>
+        <p style="font-size:12px;margin-top:8px;color:#555">
+          O navegador não executa a ISO. Para rodar Windows de verdade use a janela
+          <b>Windows Real</b> (Área de Trabalho Remota) ou a versão Android com QEMU.
+        </p>
       </div>
     </div>
   </div>
 
   <!-- SETTINGS -->
-  <div class="window" id="settings" style="left:260px;top:60px">
+  <div class="window" id="settings" style="left:220px;top:50px">
     <div class="titlebar" data-win="settings">
       <b>⚙️ Configurações</b>
       <div class="controls">
@@ -626,30 +554,19 @@ body.dark .paint-tools { background: #2b2b2b; border-bottom-color: #444; }
       </div>
     </div>
     <div class="content settings">
-      <h2 style="margin-top:0">Configurações</h2>
-
+      <h2 style="font-weight:400">Configurações</h2>
       <div class="card">
-        <h3>Aparência</h3>
-        <p style="font-size:13px;color:#666;margin:6px 0 12px">Tema claro / escuro e papel de parede.</p>
-        <button class="btn" onclick="toggleTheme()">Alternar tema claro/escuro</button>
-        <button class="btn" onclick="changeWallpaper()" style="margin-left:6px">Trocar papel de parede</button>
-      </div>
-
-      <div class="card">
-        <h3>Dados locais</h3>
-        <p style="font-size:13px;color:#666;margin:6px 0 12px">Notas, preferências e lista de ISO ficam salvas neste navegador.</p>
-        <button class="btn" onclick="clearData()">Limpar todos os dados</button>
-      </div>
-
-      <div class="card">
-        <h3>Sobre o web_app</h3>
-        <p style="font-size:13px;margin:6px 0">web_app V3 • Desktop web inspirado no Windows 10</p>
-        <span class="badge">V3</span>
-        <span class="badge" style="margin-left:6px">PWA</span>
-        <p style="font-size:12px;color:#888;margin-top:12px">
-          Funciona offline após a primeira visita (quando instalado como PWA).<br>
-          Ideal para iOS Safari e Android Chrome.
+        <h3>Sobre</h3>
+        <p style="font-size:13px">web_app — Desktop inspirado no Windows 10</p>
+        <span class="badge">V3.1</span>
+        <p style="font-size:12px;color:#777;margin-top:10px">
+          Esta é uma simulação web. Para Windows real use a janela “Windows Real”
+          ou a versão Android com QEMU.
         </p>
+      </div>
+      <div class="card">
+        <h3>Dados</h3>
+        <button class="btn" onclick="clearData()">Limpar dados locais</button>
       </div>
     </div>
   </div>
@@ -657,139 +574,113 @@ body.dark .paint-tools { background: #2b2b2b; border-bottom-color: #444; }
 
 <!-- START MENU -->
 <div id="startmenu">
-  <div class="start-head">☰ &nbsp; Iniciar</div>
-  <input class="start-search" id="startSearch" placeholder="Pesquisar aplicativos, configurações..." oninput="filterTiles()">
-  <div class="start-grid" id="startGrid">
-    <button class="tile" data-name="explorador arquivos este computador" onclick="openWin('explorer')">📁<br>Explorador<small>Arquivos</small></button>
-    <button class="tile" data-name="navegador web internet" onclick="openWin('browser')">🌐<br>Navegador<small>Web</small></button>
-    <button class="tile green" data-name="notas bloco de notas texto" onclick="openWin('notepad')">📝<br>Notas<small>Bloco de notas</small></button>
-    <button class="tile orange" data-name="calculadora calcular números" onclick="openWin('calc')">🔢<br>Calculadora<small>Cálculos</small></button>
-    <button class="tile purple" data-name="paint desenhar arte" onclick="openWin('paint')">🎨<br>Paint<small>Desenho</small></button>
-    <button class="tile teal" data-name="terminal comandos console" onclick="openWin('terminal')">⌨️<br>Terminal<small>Comandos</small></button>
-    <button class="tile red" data-name="windows iso maquina virtual vm" onclick="openWin('iso')">💿<br>Windows ISO<small>VM / ISO</small></button>
-    <button class="tile" data-name="configurações sistema ajustes" onclick="openWin('settings')">⚙️<br>Configurações<small>Sistema</small></button>
+  <div class="start-left">
+    <button title="User">👤</button>
+    <button title="Configurações" onclick="openWin('settings');hideStart()">⚙️</button>
+    <button title="Desligar" onclick="location.reload()">⏻</button>
+  </div>
+  <div class="start-main">
+    <input class="start-search" id="startSearch" placeholder="Pesquisar aplicativos..." oninput="filterTiles()">
+    <div class="start-grid" id="startGrid">
+      <button class="tile" data-name="este computador explorador" onclick="openWin('explorer')">📁<br>Este PC<small>Arquivos</small></button>
+      <button class="tile red" data-name="windows real remoto rdp" onclick="openWin('rdp')">🪟<br>Windows Real<small>Área Remota</small></button>
+      <button class="tile" data-name="edge navegador web" onclick="openWin('browser')">🌐<br>Edge<small>Navegador</small></button>
+      <button class="tile green" data-name="bloco de notas" onclick="openWin('notepad')">📝<br>Notas<small>Texto</small></button>
+      <button class="tile orange" data-name="calculadora" onclick="openWin('calc')">🔢<br>Calculadora<small>Cálculos</small></button>
+      <button class="tile teal" data-name="cmd terminal prompt" onclick="openWin('terminal')">⌨️<br>CMD<small>Terminal</small></button>
+      <button class="tile purple" data-name="iso windows" onclick="openWin('iso')">💿<br>ISO<small>Windows</small></button>
+      <button class="tile dark" data-name="configurações" onclick="openWin('settings')">⚙️<br>Config<small>Sistema</small></button>
+    </div>
   </div>
 </div>
 
-<!-- CONTEXT MENU -->
+<!-- CONTEXT -->
 <div id="context">
-  <div class="ctx" onclick="openWin('explorer');hideContext()">Abrir Este Computador</div>
-  <div class="ctx" onclick="openWin('iso');hideContext()">Windows ISO</div>
-  <div class="ctx" onclick="openWin('notepad');hideContext()">Novo documento</div>
-  <div class="ctx" onclick="openWin('paint');hideContext()">Abrir Paint</div>
-  <div class="ctx sep" onclick="location.reload()">Atualizar desktop</div>
+  <div class="ctx" onclick="openWin('explorer');hideContext()">Abrir Este PC</div>
+  <div class="ctx" onclick="openWin('rdp');hideContext()">Windows Real</div>
+  <div class="ctx" onclick="openWin('notepad');hideContext()">Bloco de Notas</div>
+  <div class="ctx sep" onclick="location.reload()">Atualizar</div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <!-- TASKBAR -->
 <div id="taskbar">
   <button class="startbtn" id="startBtn" onclick="toggleStart()">⊞</button>
   <input class="search-box" placeholder="Pesquisar" onkeydown="searchKey(event)">
-  <div class="tasks" id="taskList">
+  <div class="tasks">
     <button class="task" data-win="explorer" onclick="openWin('explorer')">📁</button>
+    <button class="task" data-win="rdp" onclick="openWin('rdp')">🪟</button>
     <button class="task" data-win="browser" onclick="openWin('browser')">🌐</button>
     <button class="task" data-win="notepad" onclick="openWin('notepad')">📝</button>
     <button class="task" data-win="calc" onclick="openWin('calc')">🔢</button>
-    <button class="task" data-win="paint" onclick="openWin('paint')">🎨</button>
     <button class="task" data-win="terminal" onclick="openWin('terminal')">⌨️</button>
-    <button class="task" data-win="iso" onclick="openWin('iso')">💿</button>
   </div>
   <div class="tray">
-    <span>🔊</span>
-    <span>📶</span>
-    <div class="clock">
-      <span id="time"></span><br>
-      <span id="date"></span>
-    </div>
+    <span>🔊</span><span>📶</span>
+    <div class="clock"><span id="time"></span><br><span id="date"></span></div>
   </div>
 </div>
 
 <script>
-/* ===== CORE ===== */
 const $ = id => document.getElementById(id);
-let zIndex = 100;
-const maximized = {};
-let lastTap = 0;
+let z = 100, maximized = {}, lastTap = 0;
 
 /* Login */
 function entrar(skip) {
-  if (!skip && $('senha').value === '' && !sessionStorage.getItem('web_app_login')) {
-    // allow empty password
-  }
   $('login').style.display = 'none';
   sessionStorage.setItem('web_app_login', '1');
-  toast('Bem-vindo ao web_app V3');
-  $('senha').value = '';
+  toast('Bem-vindo');
 }
 $('senha').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
 if (sessionStorage.getItem('web_app_login') === '1') $('login').style.display = 'none';
 
-/* Window management */
+/* Windows */
 function openWin(id) {
   const w = $(id);
   if (!w) return;
-  w.classList.remove('closing');
+  w.classList.add('show');
   w.style.display = 'block';
-  w.style.zIndex = ++zIndex;
+  w.style.zIndex = ++z;
   hideStart();
-  updateTaskbar();
-  if (id === 'paint') initPaint();
+  updateTasks();
   if (id === 'browser' && $('frame').src === 'about:blank') navigate();
 }
-
 function closeWin(id) {
   const w = $(id);
-  w.classList.add('closing');
-  setTimeout(() => {
-    w.style.display = 'none';
-    w.classList.remove('closing');
-    updateTaskbar();
-  }, 120);
+  w.classList.remove('show');
+  w.style.display = 'none';
+  updateTasks();
 }
-
-function minWin(id) {
-  $(id).style.display = 'none';
-  updateTaskbar();
-}
-
+function minWin(id) { closeWin(id); }
 function maxWin(id) {
   const w = $(id);
   if (!maximized[id]) {
-    w.dataset.old = JSON.stringify({
-      left: w.style.left, top: w.style.top,
-      width: w.style.width, height: w.style.height
-    });
+    w.dataset.old = JSON.stringify({ left: w.style.left, top: w.style.top, width: w.style.width, height: w.style.height });
     w.classList.add('maximized');
     maximized[id] = true;
   } else {
-    const old = JSON.parse(w.dataset.old || '{}');
-    Object.assign(w.style, old);
+    const o = JSON.parse(w.dataset.old || '{}');
+    Object.assign(w.style, o);
     w.classList.remove('maximized');
     maximized[id] = false;
   }
 }
-
-function updateTaskbar() {
+function updateTasks() {
   document.querySelectorAll('.task').forEach(t => {
-    const id = t.dataset.win;
-    const w = $(id);
+    const w = $(t.dataset.win);
     t.classList.toggle('active', w && w.style.display === 'block');
   });
 }
 
-/* Drag windows */
+/* Drag */
 document.querySelectorAll('.window').forEach(w => {
-  w.addEventListener('pointerdown', () => { w.style.zIndex = ++zIndex; });
+  w.addEventListener('pointerdown', () => w.style.zIndex = ++z);
   const bar = w.querySelector('.titlebar');
   let drag = false, sx, sy, ox, oy;
-
   bar.addEventListener('pointerdown', e => {
     if (maximized[w.id] || e.target.closest('.controls')) return;
-    drag = true;
-    sx = e.clientX; sy = e.clientY;
-    ox = w.offsetLeft; oy = w.offsetTop;
+    drag = true; sx = e.clientX; sy = e.clientY; ox = w.offsetLeft; oy = w.offsetTop;
     bar.setPointerCapture(e.pointerId);
   });
   bar.addEventListener('pointermove', e => {
@@ -797,44 +688,31 @@ document.querySelectorAll('.window').forEach(w => {
     w.style.left = Math.max(0, ox + e.clientX - sx) + 'px';
     w.style.top = Math.max(0, oy + e.clientY - sy) + 'px';
   });
-  bar.addEventListener('pointerup', () => { drag = false; });
+  bar.addEventListener('pointerup', () => drag = false);
 });
 
-/* Touch double-tap for icons */
-function handleIconTap(e, id) {
+/* Touch icons */
+function tapIcon(e, id) {
   const now = Date.now();
-  if (now - lastTap < 300) {
-    e.preventDefault();
-    openWin(id);
-  }
+  if (now - lastTap < 300) { e.preventDefault(); openWin(id); }
   lastTap = now;
 }
 
-/* Start menu */
+/* Start */
 function toggleStart() {
-  const s = $('startmenu');
-  const btn = $('startBtn');
-  if (s.style.display === 'block') {
-    s.style.display = 'none';
-    btn.classList.remove('active');
-  } else {
-    s.style.display = 'block';
-    btn.classList.add('active');
-    $('startSearch').focus();
-  }
+  const s = $('startmenu'), b = $('startBtn');
+  if (s.style.display === 'block') { s.style.display = 'none'; b.classList.remove('active'); }
+  else { s.style.display = 'block'; b.classList.add('active'); $('startSearch').focus(); }
 }
-function hideStart() {
-  $('startmenu').style.display = 'none';
-  $('startBtn').classList.remove('active');
-}
+function hideStart() { $('startmenu').style.display = 'none'; $('startBtn').classList.remove('active'); }
 
-/* Context menu */
+/* Context */
 function hideContext() { $('context').style.display = 'none'; }
 document.addEventListener('contextmenu', e => {
   e.preventDefault();
   const c = $('context');
-  c.style.left = Math.min(e.clientX, innerWidth - 210) + 'px';
-  c.style.top = Math.min(e.clientY, innerHeight - 160) + 'px';
+  c.style.left = Math.min(e.clientX, innerWidth - 200) + 'px';
+  c.style.top = Math.min(e.clientY, innerHeight - 140) + 'px';
   c.style.display = 'block';
 });
 document.addEventListener('click', e => {
@@ -843,13 +721,12 @@ document.addEventListener('click', e => {
 });
 
 /* Clock */
-function updateClock() {
+function tick() {
   const d = new Date();
   $('time').textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   $('date').textContent = d.toLocaleDateString();
 }
-setInterval(updateClock, 1000);
-updateClock();
+setInterval(tick, 1000); tick();
 
 /* Notes */
 const notes = $('notes');
@@ -867,7 +744,7 @@ function navigate() {
 function openExternal() {
   let u = $('url').value.trim();
   if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
-  window.open(u, '_blank', 'noopener,noreferrer');
+  window.open(u, '_blank', 'noopener');
 }
 
 /* Calculator */
@@ -877,120 +754,14 @@ function calcInput(v) {
   calcExpr += v;
   $('calcDisplay').textContent = calcExpr;
 }
-function calcClear() {
-  calcExpr = '';
-  $('calcDisplay').textContent = '0';
-}
+function calcClear() { calcExpr = ''; $('calcDisplay').textContent = '0'; }
 function calcEval() {
   try {
-    // Safe eval for simple math
-    const result = Function('"use strict"; return (' + calcExpr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-') + ')')();
-    calcExpr = String(result);
+    const r = Function('"use strict";return(' + calcExpr.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-') + ')')();
+    calcExpr = String(r);
     $('calcDisplay').textContent = calcExpr;
-  } catch {
-    $('calcDisplay').textContent = 'Erro';
-    calcExpr = '';
-  }
+  } catch { $('calcDisplay').textContent = 'Erro'; calcExpr = ''; }
 }
-
-/* Paint */
-let paintReady = false;
-function initPaint() {
-  if (paintReady) return;
-  const canvas = $('paintCanvas');
-  const ctx = canvas.getContext('2d');
-  const resize = () => {
-    const parent = canvas.parentElement;
-    canvas.width = parent.clientWidth;
-    canvas.height = parent.clientHeight - 48;
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  };
-  resize();
-  window.addEventListener('resize', () => { if ($('paint').style.display === 'block') resize(); });
-
-  let drawing = false;
-  const getPos = e => {
-    const r = canvas.getBoundingClientRect();
-    const t = e.touches ? e.touches[0] : e;
-    return { x: t.clientX - r.left, y: t.clientY - r.top };
-  };
-
-  const start = e => { e.preventDefault(); drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
-  const move = e => {
-    if (!drawing) return;
-    e.preventDefault();
-    const p = getPos(e);
-    ctx.strokeStyle = $('paintColor').value;
-    ctx.lineWidth = $('paintSize').value;
-    ctx.lineCap = 'round';
-    ctx.lineTo(p.x, p.y);
-    ctx.stroke();
-  };
-  const end = () => { drawing = false; };
-
-  canvas.addEventListener('pointerdown', start);
-  canvas.addEventListener('pointermove', move);
-  canvas.addEventListener('pointerup', end);
-  canvas.addEventListener('pointerleave', end);
-  paintReady = true;
-}
-function paintClear() {
-  const canvas = $('paintCanvas');
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-}
-
-/* Explorer */
-const folders = {
-  home: [
-    { name: 'Documentos', icon: '📁', action: () => navExplorer('docs') },
-    { name: 'Downloads', icon: '📁', action: () => navExplorer('downloads') },
-    { name: 'Imagens', icon: '🖼️', action: () => navExplorer('images') },
-    { name: 'ISO do Windows', icon: '💿', action: () => openWin('iso') },
-    { name: 'Lixeira', icon: '🗑️', action: () => navExplorer('trash') }
-  ],
-  docs: [
-    { name: 'Anotações.txt', icon: '📄', action: () => openWin('notepad') },
-    { name: 'Projeto web_app', icon: '📁', action: () => toast('Pasta local do projeto') }
-  ],
-  downloads: [
-    { name: 'Nenhum arquivo', icon: '📭', action: () => {} }
-  ],
-  images: [
-    { name: 'Wallpaper', icon: '🖼️', action: () => changeWallpaper() }
-  ],
-  iso: [
-    { name: 'Gerenciador de ISO', icon: '💿', action: () => openWin('iso') }
-  ],
-  trash: [
-    { name: 'Vazia', icon: '🗑️', action: () => {} }
-  ]
-};
-
-function navExplorer(folder) {
-  const files = folders[folder] || folders.home;
-  const names = { home: 'Este Computador', docs: 'Documentos', downloads: 'Downloads', images: 'Imagens', iso: 'Windows ISO', trash: 'Lixeira' };
-  $('explorerPath').value = names[folder] || folder;
-  $('explorerStatus').textContent = (names[folder] || folder) + ' • armazenamento local do navegador';
-
-  document.querySelectorAll('.side-item').forEach(el => el.classList.remove('active'));
-  const sideMap = { home: 0, docs: 1, downloads: 2, images: 3, iso: 4, trash: 5 };
-  const items = document.querySelectorAll('.side-item');
-  if (items[sideMap[folder]]) items[sideMap[folder]].classList.add('active');
-
-  const container = $('explorerFiles');
-  container.innerHTML = '';
-  files.forEach(f => {
-    const div = document.createElement('div');
-    div.className = 'file';
-    div.innerHTML = `<span>${f.icon}</span>${f.name}`;
-    div.onclick = f.action;
-    container.appendChild(div);
-  });
-}
-navExplorer('home');
 
 /* Terminal */
 function terminalKey(e) {
@@ -999,32 +770,20 @@ function terminalKey(e) {
   const o = $('termout');
   const add = t => {
     const d = document.createElement('div');
-    d.className = 'line';
-    d.innerHTML = t;
-    o.insertBefore(d, o.lastChild.previousSibling || o.lastChild);
+    d.textContent = t;
+    o.insertBefore(d, o.lastChild);
   };
-
-  if (v === 'help') {
-    add('Comandos: help, clear, date, time, about, calc, paint, iso, open [app], theme');
-  } else if (v === 'clear') {
-    o.innerHTML = '<span class="prompt">web_app&gt; </span><input id="term" onkeydown="terminalKey(event)" autocomplete="off">';
-    $('term').focus();
-    e.target.value = '';
-    return;
-  } else if (v === 'date') add(new Date().toLocaleDateString());
+  if (v === 'help') add('help | clear | date | time | about | dir | ver');
+  else if (v === 'clear' || v === 'cls') {
+    o.innerHTML = '<span class="prompt">C:\\Users\\User&gt; </span><input id="term" onkeydown="terminalKey(event)" autocomplete="off">';
+    $('term').focus(); e.target.value = ''; return;
+  }
+  else if (v === 'date') add(new Date().toLocaleDateString());
   else if (v === 'time') add(new Date().toLocaleTimeString());
-  else if (v === 'about') add('web_app V3 — Desktop Windows 10 no navegador');
-  else if (v === 'calc') { openWin('calc'); add('Calculadora aberta.'); }
-  else if (v === 'paint') { openWin('paint'); add('Paint aberto.'); }
-  else if (v === 'iso') { openWin('iso'); add('Gerenciador de ISO aberto.'); }
-  else if (v === 'theme') { toggleTheme(); add('Tema alternado.'); }
-  else if (v.startsWith('open ')) {
-    const app = v.slice(5).trim();
-    const map = { explorer: 'explorer', files: 'explorer', browser: 'browser', notes: 'notepad', notepad: 'notepad', calc: 'calc', paint: 'paint', terminal: 'terminal', iso: 'iso', settings: 'settings' };
-    if (map[app]) { openWin(map[app]); add('Abrindo ' + app + '...'); }
-    else add('App não encontrado: ' + app);
-  } else if (v) add('Comando não encontrado: ' + v + ' — digite help');
-
+  else if (v === 'ver') add('Microsoft Windows [Versão 10.0.19045.3800]');
+  else if (v === 'dir') add('Diretório de C:\\Users\\User\n\n23/10/2025  14:30    <DIR>          Documents\n23/10/2025  14:30    <DIR>          Downloads');
+  else if (v === 'about') add('web_app — simulação Windows 10');
+  else if (v) add('\'' + v + '\' não é reconhecido como comando interno ou externo.');
   e.target.value = '';
   o.scrollTop = o.scrollHeight;
 }
@@ -1033,98 +792,58 @@ function terminalKey(e) {
 function searchKey(e) {
   if (e.key !== 'Enter') return;
   const q = e.target.value.toLowerCase();
-  if (q.includes('iso') || q.includes('windows')) openWin('iso');
+  if (q.includes('real') || q.includes('remoto') || q.includes('rdp')) openWin('rdp');
+  else if (q.includes('iso')) openWin('iso');
   else if (q.includes('nota')) openWin('notepad');
-  else if (q.includes('calc') || q.includes('calcul')) openWin('calc');
-  else if (q.includes('paint') || q.includes('desen')) openWin('paint');
-  else if (q.includes('terminal') || q.includes('cmd')) openWin('terminal');
+  else if (q.includes('calc')) openWin('calc');
+  else if (q.includes('cmd') || q.includes('terminal')) openWin('terminal');
   else if (q.includes('config')) openWin('settings');
-  else if (q.includes('arquivo') || q.includes('explorer')) openWin('explorer');
-  else if (q.includes('web') || q.includes('naveg') || q.includes('browser')) openWin('browser');
-  else toast('Nenhum aplicativo encontrado');
+  else if (q.includes('arquivo') || q.includes('este')) openWin('explorer');
+  else if (q.includes('edge') || q.includes('web') || q.includes('naveg')) openWin('browser');
+  else toast('Nenhum app encontrado');
   e.target.value = '';
 }
-
 function filterTiles() {
   const q = $('startSearch').value.toLowerCase();
-  document.querySelectorAll('#startGrid .tile').forEach(x => {
-    x.style.display = x.dataset.name.includes(q) ? 'block' : 'none';
+  document.querySelectorAll('#startGrid .tile').forEach(t => {
+    t.style.display = t.dataset.name.includes(q) ? 'block' : 'none';
   });
 }
 
-/* Theme & Wallpaper */
-const wallpapers = [
-  'linear-gradient(135deg, #0879b9 0%, #063d78 55%, #0a1628 100%)',
-  'linear-gradient(135deg, #1a2980 0%, #26d0ce 100%)',
-  'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
-  'linear-gradient(135deg, #141e30 0%, #243b55 100%)',
-  'linear-gradient(135deg, #000428 0%, #004e92 100%)',
-  'linear-gradient(160deg, #0c1445 0%, #1a3a6b 40%, #0d2137 100%)'
-];
-let wallIdx = 0;
-
-function toggleTheme() {
-  document.body.classList.toggle('dark');
-  localStorage.setItem('web_app_dark', document.body.classList.contains('dark') ? '1' : '0');
-  toast(document.body.classList.contains('dark') ? 'Tema escuro ativado' : 'Tema claro ativado');
-}
-function changeWallpaper() {
-  wallIdx = (wallIdx + 1) % wallpapers.length;
-  $('desktop').style.background = wallpapers[wallIdx];
-  localStorage.setItem('web_app_wall', wallIdx);
-  toast('Papel de parede alterado');
-}
-if (localStorage.getItem('web_app_dark') === '1') document.body.classList.add('dark');
-if (localStorage.getItem('web_app_wall')) {
-  wallIdx = parseInt(localStorage.getItem('web_app_wall')) || 0;
-  $('desktop').style.background = wallpapers[wallIdx];
+/* RDP */
+function connectRDP() {
+  const host = $('rdpHost').value.trim();
+  if (!host) { toast('Digite o endereço do servidor'); return; }
+  const port = $('rdpPort').value || '3389';
+  toast('No celular use o app "Área de Trabalho Remota" da Microsoft com: ' + host + ':' + port);
+  // Dica: em desktop pode tentar abrir o protocolo rdp://
+  try { window.location.href = 'rdp://' + host + ':' + port; } catch(e) {}
 }
 
-/* ISO Manager */
-const isoDrop = $('isoDrop');
+/* ISO */
 $('isoFile').addEventListener('change', e => {
   const f = e.target.files[0];
   if (!f) return;
   const mb = (f.size / 1024 / 1024).toFixed(1);
-  $('isoInfo').innerHTML = `<b>${f.name}</b><br>Tamanho: ${mb} MB<br><span class="badge">ISO selecionada localmente</span>`;
+  $('isoInfo').innerHTML = '<b>' + f.name + '</b> — ' + mb + ' MB';
   localStorage.setItem('web_app_iso', JSON.stringify({ name: f.name, size: f.size }));
-  toast('ISO adicionada ao gerenciador');
+  toast('ISO registrada localmente');
 });
-
-// Drag & drop
-['dragenter', 'dragover'].forEach(ev => {
-  isoDrop.addEventListener(ev, e => { e.preventDefault(); isoDrop.classList.add('dragover'); });
-});
-['dragleave', 'drop'].forEach(ev => {
-  isoDrop.addEventListener(ev, e => { e.preventDefault(); isoDrop.classList.remove('dragover'); });
-});
-isoDrop.addEventListener('drop', e => {
-  const f = e.dataTransfer.files[0];
-  if (f) {
-    $('isoFile').files = e.dataTransfer.files;
-    $('isoFile').dispatchEvent(new Event('change'));
-  }
-});
-
-const savedIso = localStorage.getItem('web_app_iso');
-if (savedIso) {
+const saved = localStorage.getItem('web_app_iso');
+if (saved) {
   try {
-    const x = JSON.parse(savedIso);
-    $('isoInfo').innerHTML = `<b>${x.name}</b><br>Tamanho: ${(x.size / 1024 / 1024).toFixed(1)} MB<br><span class="badge">ISO registrada neste navegador</span>`;
+    const x = JSON.parse(saved);
+    $('isoInfo').innerHTML = '<b>' + x.name + '</b> — ' + (x.size/1024/1024).toFixed(1) + ' MB';
   } catch {}
 }
 
-/* Clear data */
+/* Clear */
 function clearData() {
-  if (!confirm('Limpar todas as notas, preferências e ISO salvas?')) return;
-  localStorage.removeItem('web_app_notes');
-  localStorage.removeItem('web_app_iso');
-  localStorage.removeItem('web_app_dark');
-  localStorage.removeItem('web_app_wall');
+  if (!confirm('Limpar todos os dados salvos?')) return;
+  localStorage.clear();
   notes.value = '';
-  $('isoInfo').textContent = 'Nenhuma ISO selecionada.';
-  document.body.classList.remove('dark');
-  toast('Dados locais limpos');
+  $('isoInfo').textContent = 'Nenhuma ISO selecionada';
+  toast('Dados limpos');
 }
 
 /* Toast */
@@ -1133,10 +852,10 @@ function toast(t) {
   el.textContent = t;
   el.style.display = 'block';
   clearTimeout(window._tt);
-  window._tt = setTimeout(() => { el.style.display = 'none'; }, 2400);
+  window._tt = setTimeout(() => el.style.display = 'none', 2800);
 }
 
-/* PWA service worker registration */
+/* PWA */
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }
